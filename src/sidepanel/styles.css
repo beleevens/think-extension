@@ -1,0 +1,874 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 48 86% 98%;
+    --foreground: 222.2 84% 5%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 5%;
+    --primary: 192 61% 59%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 192 61% 59%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 5%;
+    --foreground: 48 86% 97%;
+    --card: 230 30% 12%;
+    --card-foreground: 48 86% 97%;
+    --popover: 230 30% 12%;
+    --popover-foreground: 48 86% 97%;
+    --primary: 192 61% 59%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 240 9% 15%;
+    --secondary-foreground: 48 86% 97%;
+    --muted: 230 55% 8%;
+    --muted-foreground: 235 9% 49%;
+    --accent: 230 22% 12%;
+    --accent-foreground: 48 86% 97%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 235 26% 16%;
+    --input: 235 26% 16%;
+    --ring: 192 61% 59%;
+  }
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Chat Panel */
+.chat-panel {
+  @apply flex flex-col h-full text-foreground;
+  background: transparent; /* Allow gradient to show through */
+}
+
+/* Header */
+.header {
+  @apply border-b border-border flex flex-col;
+  padding: calc(1rem - 1px) 1rem;
+  min-height: 62px;
+  max-height: 62px;
+  box-sizing: border-box;
+  background: hsl(var(--background));
+}
+
+.header-row {
+  @apply flex items-center justify-between;
+}
+
+.header h1 {
+  @apply text-lg font-bold text-foreground;
+}
+
+.settings-button {
+  @apply flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200;
+  @apply text-muted-foreground hover:text-foreground hover:bg-accent;
+  @apply cursor-pointer border-none bg-transparent;
+}
+
+.settings-button:active {
+  @apply scale-95;
+}
+
+.settings-button svg {
+  @apply transition-transform duration-200;
+}
+
+.settings-button:hover svg {
+  @apply scale-110;
+}
+
+.status {
+  @apply flex items-center gap-2 text-sm;
+}
+
+.status.connected {
+  @apply text-green-600;
+}
+
+.status.disconnected {
+  @apply text-red-600;
+}
+
+.status-indicator {
+  @apply w-2 h-2 rounded-full;
+}
+
+.status.connected .status-indicator {
+  @apply bg-green-500 animate-pulse;
+}
+
+.status.disconnected .status-indicator {
+  @apply bg-red-500;
+}
+
+/* Messages Container */
+.messages {
+  @apply flex-1 overflow-y-auto p-4 space-y-4;
+  background: transparent; /* Allow gradient to show through */
+}
+
+.messages::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.messages::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+
+.messages::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50 rounded-full;
+}
+
+/* Empty State */
+.empty-state {
+  @apply flex flex-col items-center justify-center h-full text-center px-8;
+}
+
+.empty-state p {
+  @apply text-muted-foreground text-lg mb-2;
+}
+
+.empty-state .hint {
+  @apply text-muted-foreground text-sm;
+}
+
+/* Message */
+.message {
+  @apply flex flex-col gap-2;
+}
+
+.message.user {
+  @apply items-end;
+}
+
+.message.assistant {
+  @apply items-start;
+}
+
+.message.system {
+  @apply items-center w-full;
+}
+
+.message-bubble {
+  @apply max-w-[80%] px-4 py-3 rounded-lg break-words;
+}
+
+.message.user .message-bubble {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  font-size: 10pt;
+  line-height: 1.5;
+}
+
+.message.assistant .message-bubble {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding-left: 0;
+  padding-right: 0;
+  max-width: 90%;
+  font-size: 12pt;
+  line-height: 1.5;
+}
+
+/* Compact system messages - centered with decorative lines */
+.message.system .message-bubble {
+  @apply max-w-full px-4 py-2 text-xs text-slate-600 bg-transparent border-0 shadow-none not-italic;
+  @apply flex items-center justify-center gap-3;
+}
+
+.message.system .message-bubble::before,
+.message.system .message-bubble::after {
+  content: '';
+  @apply flex-1 h-px bg-gradient-to-r opacity-30;
+}
+
+.message.system .message-bubble::before {
+  @apply from-transparent to-slate-300;
+}
+
+.message.system .message-bubble::after {
+  @apply from-slate-300 to-transparent;
+}
+
+/* Card-style for interactive system messages (note saves) */
+.message.system.interactive {
+  @apply items-stretch;
+}
+
+.message.system.interactive .message-bubble {
+  @apply max-w-[90%] bg-card border border-emerald-200 rounded-xl px-4 py-3 shadow-sm;
+  @apply hover:shadow-md hover:border-emerald-300 transition-all duration-200 cursor-pointer;
+  @apply justify-between gap-3;
+}
+
+.message.system.interactive .message-bubble::before,
+.message.system.interactive .message-bubble::after {
+  content: none;
+}
+
+.message-time {
+  @apply text-xs text-muted-foreground;
+}
+
+.message-model {
+  @apply text-xs text-muted-foreground/70;
+}
+
+/* Input Area */
+.input-area {
+  @apply border-t border-border p-4 flex flex-col gap-2;
+  background: hsl(var(--background));
+}
+
+.input-controls {
+  @apply flex gap-2;
+}
+
+.input-textarea {
+  @apply flex-1 bg-background border border-input rounded-lg px-3 py-2 text-foreground resize-none outline-none;
+  min-height: 40px;
+  max-height: 40px;
+  font-size: 12pt;
+  overflow: hidden;
+}
+
+.input-textarea:focus {
+  @apply border-primary ring-2 ring-ring ring-offset-2;
+}
+
+.input-textarea:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.input-textarea::placeholder {
+  @apply text-muted-foreground;
+}
+
+/* Buttons - Shared Design System */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+}
+
+.btn-danger {
+  @apply bg-destructive text-destructive-foreground hover:bg-destructive/90;
+}
+
+.btn-icon {
+  @apply p-2 rounded-lg hover:bg-accent transition-colors;
+}
+
+.btn-sm {
+  @apply text-sm px-3 py-1 h-8 flex items-center justify-center;
+}
+
+.btn-accent {
+  @apply bg-accent text-accent-foreground hover:bg-accent/90;
+}
+
+.btn-icon-accent {
+  @apply w-8 h-8 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 flex items-center justify-center disabled:opacity-60;
+}
+
+/* Streaming indicator */
+.streaming-indicator {
+  @apply flex items-center gap-2 text-sm text-muted-foreground;
+}
+
+.streaming-dots {
+  @apply flex gap-1;
+}
+
+.streaming-dot {
+  @apply w-2 h-2 bg-primary rounded-full animate-bounce;
+  animation-delay: 0s;
+}
+
+.streaming-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.streaming-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Spin animation for loading spinners */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Pulse animation for connection status dot */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+}
+
+.status-dot.connected {
+  @apply bg-green-500;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.status-dot.disconnected {
+  @apply bg-red-500;
+}
+
+.provider-model-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  margin-left: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50 rounded-full;
+}
+
+/* Context Badge */
+.context-badge {
+  @apply flex items-center justify-between gap-2 mb-3 px-3 py-2 bg-sky-50 border border-sky-200 rounded-lg;
+  @apply shadow-sm;
+}
+
+.context-badge-content {
+  @apply flex items-center gap-2 flex-1 min-w-0;
+}
+
+.context-badge-icon {
+  @apply flex-shrink-0 text-sky-600;
+}
+
+.context-title {
+  @apply text-sm text-sky-700 flex-1 truncate font-medium;
+}
+
+.context-clear {
+  @apply text-sky-600 hover:text-sky-800 hover:bg-sky-100 rounded px-2 py-1 transition-colors text-sm flex-shrink-0;
+}
+
+/* Note Link */
+.note-link {
+  @apply text-emerald-700 hover:text-emerald-900 font-medium transition-colors;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* Note Card Message - Interactive card for saved notes */
+.note-card-message {
+  @apply flex items-start justify-between gap-3 w-full;
+}
+
+.note-card-message-content {
+  @apply flex flex-col gap-1.5 flex-1 min-w-0;
+}
+
+.note-card-message-header {
+  @apply flex items-center gap-2;
+}
+
+.note-card-message-icon {
+  @apply flex-shrink-0 text-emerald-600;
+}
+
+.note-card-message-label {
+  @apply text-xs font-semibold text-emerald-600 uppercase tracking-wide;
+}
+
+.note-card-message-title {
+  @apply text-sm font-medium text-card-foreground;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.note-card-message-action {
+  @apply flex-shrink-0 text-emerald-600 hover:text-emerald-700 mt-1;
+}
+
+/* ============ App Container ============ */
+.app-container {
+  @apply flex flex-col h-full;
+  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+}
+
+/* ============ Notes Panel ============ */
+.notes-panel {
+  @apply flex flex-col h-full bg-muted/50;
+}
+
+.notes-header {
+  @apply bg-card border-b border-border p-4;
+}
+
+.notes-header h1 {
+  @apply text-lg font-bold text-foreground mb-1;
+}
+
+.notes-count {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Search Bar */
+.search-bar {
+  @apply flex items-center gap-2 bg-card border-b border-border px-4 py-3 sticky top-0 z-10;
+}
+
+.search-icon {
+  @apply text-muted-foreground flex-shrink-0;
+}
+
+.search-input {
+  @apply flex-1 bg-transparent border-none outline-none text-foreground placeholder-muted-foreground;
+}
+
+.search-clear {
+  @apply text-muted-foreground hover:text-foreground bg-transparent border-none cursor-pointer p-1 rounded transition-colors;
+}
+
+/* Tag Filter Bar */
+.tag-filter-bar {
+  @apply flex items-center gap-3 bg-card border-b border-border px-4 py-3;
+}
+
+.tag-filter-label {
+  @apply flex items-center gap-1 text-sm text-foreground font-medium flex-shrink-0;
+}
+
+.tag-filter-pills {
+  @apply flex flex-wrap items-center gap-2 flex-1 overflow-x-auto;
+}
+
+.tag-pill {
+  @apply px-3 py-1 rounded-full text-xs font-medium border cursor-pointer transition-all;
+  @apply bg-secondary border-border text-secondary-foreground hover:bg-secondary/80;
+}
+
+.tag-pill.active {
+  @apply bg-primary text-primary-foreground border-primary hover:bg-primary/90;
+}
+
+.tag-filter-clear {
+  @apply text-xs text-muted-foreground hover:text-foreground underline cursor-pointer bg-transparent border-none flex-shrink-0;
+}
+
+/* Notes List */
+.notes-list {
+  @apply flex-1 overflow-y-auto p-4 space-y-3;
+}
+
+.notes-list::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.notes-list::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.notes-list::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+
+.notes-list::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50 rounded-full;
+}
+
+/* Notes Empty State */
+.notes-empty {
+  @apply flex flex-col items-center justify-center h-full text-center px-8 py-12;
+}
+
+.notes-empty p {
+  @apply text-muted-foreground text-base mb-2;
+}
+
+.notes-empty-hint {
+  @apply text-muted-foreground text-sm;
+}
+
+.link-button {
+  @apply text-primary hover:underline cursor-pointer bg-transparent border-none p-0 font-medium;
+}
+
+/* Note Card */
+.note-card {
+  @apply bg-card rounded-lg border border-border overflow-hidden transition-all duration-200;
+  @apply hover:shadow-md hover:border-muted-foreground/30;
+}
+
+.note-card.expanded {
+  @apply shadow-lg border-primary/50;
+}
+
+.note-card-header {
+  @apply p-4 cursor-pointer;
+}
+
+.note-card-title-row {
+  @apply flex items-start justify-between gap-2 mb-2;
+}
+
+.note-card-title {
+  @apply text-base font-semibold text-foreground flex-1 line-clamp-2;
+}
+
+.note-card-date {
+  @apply flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0;
+}
+
+.note-card-meta {
+  @apply flex items-center gap-3 mb-2 text-xs;
+}
+
+.note-card-domain {
+  @apply text-muted-foreground truncate;
+}
+
+.note-card-reason {
+  @apply flex items-center gap-1 text-foreground truncate;
+  @apply bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded;
+}
+
+.note-card-tags {
+  @apply flex flex-wrap items-center gap-1.5 mt-2;
+}
+
+.note-tag-badge {
+  @apply px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer transition-all;
+  @apply bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900 dark:to-blue-900 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700;
+  @apply hover:from-purple-200 hover:to-blue-200 dark:hover:from-purple-800 dark:hover:to-blue-800 hover:border-purple-300 dark:hover:border-purple-600;
+}
+
+.note-card-preview {
+  @apply text-sm text-muted-foreground line-clamp-2 mt-2;
+}
+
+/* Note Card Body (Expanded) */
+.note-card-body {
+  @apply border-t border-border p-4 space-y-4;
+}
+
+.note-reason-full {
+  @apply bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm text-foreground;
+}
+
+.note-reason-full strong {
+  @apply text-foreground font-semibold;
+}
+
+.note-content {
+  @apply text-sm text-foreground leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto;
+  @apply border border-border rounded-lg p-3 bg-muted/50;
+}
+
+.note-content::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.note-content::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.note-content::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+
+.note-card-actions {
+  @apply flex items-center gap-2;
+}
+
+.btn-danger {
+  @apply bg-destructive text-destructive-foreground hover:bg-destructive/90;
+}
+
+.btn-danger:disabled {
+  @apply opacity-50;
+}
+
+/* Provider Selector */
+.provider-selector {
+  @apply flex items-center gap-2 py-2 px-1;
+  @apply border-b border-border;
+}
+
+.provider-label {
+  @apply text-xs font-semibold text-muted-foreground uppercase tracking-wide;
+  @apply flex-shrink-0;
+}
+
+.provider-dropdown {
+  @apply px-3 py-1.5 rounded-md text-sm font-medium;
+  @apply bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950;
+  @apply border border-blue-200 dark:border-blue-800;
+  @apply text-foreground;
+  @apply cursor-pointer transition-all duration-200;
+  @apply hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900 dark:hover:to-purple-900 hover:border-blue-300 dark:hover:border-blue-700;
+  @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1;
+  @apply shadow-sm;
+}
+
+.provider-dropdown option {
+  @apply bg-background text-foreground py-2;
+}
+
+/* Utility classes */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Save Dialog Animations */
+.save-dialog-success-glow {
+  box-shadow: 0 0 30px hsl(142 76% 36% / 0.3), 0 0 60px hsl(142 76% 36% / 0.15);
+  animation: successPulse 1.5s ease-in-out;
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    box-shadow: 0 0 30px hsl(142 76% 36% / 0.3), 0 0 60px hsl(142 76% 36% / 0.15);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(142 76% 36% / 0.4), 0 0 80px hsl(142 76% 36% / 0.2);
+  }
+}
+
+/* ============ Markdown Rendering in Chat Messages ============ */
+/* Compact styling for assistant messages with markdown */
+
+.message-markdown {
+  @apply text-sm leading-relaxed;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Headings - Compact sizes for chat */
+.message-markdown h1 {
+  @apply text-lg font-bold mt-3 mb-2 text-card-foreground;
+}
+
+.message-markdown h2 {
+  @apply text-base font-semibold mt-3 mb-2 text-card-foreground;
+}
+
+.message-markdown h3 {
+  @apply text-sm font-semibold mt-2 mb-1 text-card-foreground;
+}
+
+.message-markdown h4,
+.message-markdown h5,
+.message-markdown h6 {
+  @apply text-sm font-medium mt-2 mb-1 text-card-foreground;
+}
+
+.message-markdown h1:first-child,
+.message-markdown h2:first-child,
+.message-markdown h3:first-child {
+  margin-top: 0;
+}
+
+/* Paragraphs */
+.message-markdown p {
+  @apply my-2 text-card-foreground;
+}
+
+.message-markdown p:first-child {
+  margin-top: 0;
+}
+
+.message-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+/* Links */
+.message-markdown a {
+  @apply text-primary underline hover:text-primary/80 transition-colors;
+}
+
+/* Lists */
+.message-markdown ul,
+.message-markdown ol {
+  @apply my-2 pl-5;
+}
+
+.message-markdown ul {
+  @apply list-disc;
+}
+
+.message-markdown ol {
+  @apply list-decimal;
+}
+
+.message-markdown li {
+  @apply my-1 text-card-foreground;
+}
+
+.message-markdown li > p {
+  @apply my-0.5;
+}
+
+.message-markdown ul ul,
+.message-markdown ol ul,
+.message-markdown ul ol,
+.message-markdown ol ol {
+  @apply my-1;
+}
+
+/* Blockquotes */
+.message-markdown blockquote {
+  @apply my-2 pl-3 py-1 border-l-2 border-primary/50 italic text-muted-foreground;
+}
+
+.message-markdown blockquote p {
+  @apply my-1;
+}
+
+/* Inline Code */
+.message-markdown code {
+  @apply bg-secondary text-destructive px-1.5 py-0.5 rounded text-xs font-mono;
+}
+
+/* Code Blocks */
+.message-markdown pre {
+  @apply my-2 p-3 bg-muted rounded-lg overflow-x-auto;
+}
+
+.message-markdown pre code {
+  @apply bg-transparent text-foreground p-0 text-xs leading-relaxed block;
+}
+
+/* Horizontal Rule */
+.message-markdown hr {
+  @apply my-3 border-0 border-t border-border;
+}
+
+/* Tables */
+.message-markdown table {
+  @apply my-2 w-full border-collapse text-xs;
+}
+
+.message-markdown th {
+  @apply bg-muted px-2 py-1 border border-border text-left font-semibold text-foreground;
+}
+
+.message-markdown td {
+  @apply px-2 py-1 border border-border text-foreground;
+}
+
+.message-markdown tr:nth-child(even) {
+  @apply bg-muted/50;
+}
+
+/* Images */
+.message-markdown img {
+  @apply max-w-full h-auto rounded my-2;
+}
+
+/* Bold and Italic */
+.message-markdown strong {
+  @apply font-semibold text-card-foreground;
+}
+
+.message-markdown em {
+  @apply italic;
+}
+
+/* Strikethrough */
+.message-markdown del {
+  @apply line-through text-muted-foreground;
+}
+
+/* Task Lists */
+.message-markdown input[type="checkbox"] {
+  @apply mr-2;
+}
+
+/* Markdown Error Display */
+.markdown-error {
+  @apply text-destructive p-2 bg-destructive/10 rounded text-sm border border-destructive/30;
+}
+
+.dark .markdown-error {
+  @apply bg-destructive/20;
+}

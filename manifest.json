@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Think Better - AI Notes",
+  "version": "1.0.0",
+  "description": "AI-powered note taking with cloud LLM. No account required - all notes stored locally.",
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "sidePanel",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "Open Think Better"
+  },
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  },
+  "options_page": "src/settings/settings.html",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://api.venice.ai https://api.anthropic.com http://localhost:11434;"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "config",
+  "id": "action-items",
+  "name": "Action Items",
+  "description": "Extracts actionable steps and tasks from articles",
+  "icon": "✅",
+  "prompt": "Extract 3-5 actionable steps or tasks from this article. Format as a bulleted list using '- ' prefix.\n\nTitle: {{title}}\n\nContent: {{content}}",
+  "outputType": "text",
+  "display": {
+    "dataSource": "action-items",
+    "position": "tab",
+    "format": "text",
+    "tabName": "Action Items"
+  }
+}

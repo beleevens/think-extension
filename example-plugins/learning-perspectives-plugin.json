@@ -1,0 +1,28 @@
+{
+  "type": "config",
+  "id": "learning-perspectives",
+  "name": "Learning Perspectives",
+  "description": "Multiple educational perspectives on the article content",
+  "icon": "🎓",
+  "outputType": "blocks",
+  "display": {
+    "dataSource": "learning-perspectives",
+    "position": "tab",
+    "format": "blocks",
+    "tabName": "Learning"
+  },
+  "blocks": [
+    {
+      "name": "Beginner Guide",
+      "prompt": "Explain this article for someone who is completely new to the topic. Use simple language, define all technical terms, and provide analogies.\n\n{{content}}"
+    },
+    {
+      "name": "Deep Dive",
+      "prompt": "Provide an advanced, technical analysis of this article. Identify underlying principles, potential implications, and connections to related concepts.\n\n{{content}}"
+    },
+    {
+      "name": "Critical Analysis",
+      "prompt": "Critically analyze this article. What assumptions does it make? What questions does it leave unanswered? What alternative viewpoints should be considered?\n\n{{content}}"
+    }
+  ]
+}

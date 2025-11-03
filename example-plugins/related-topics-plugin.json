@@ -1,0 +1,14 @@
+{
+  "type": "config",
+  "id": "related-topics",
+  "name": "Related Topics",
+  "description": "Suggests related topics and areas to explore",
+  "icon": "🔗",
+  "prompt": "Based on this article, suggest 5-7 related topics or areas the reader might want to explore next. Format as JSON array.\n\nTitle: {{title}}\n\nContent: {{content}}\n\nReturn: {\"tags\": [\"topic1\", \"topic2\", ...]}",
+  "outputType": "tags",
+  "display": {
+    "dataSource": "related-topics",
+    "position": "header",
+    "format": "tags"
+  }
+}
