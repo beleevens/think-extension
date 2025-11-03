@@ -42,8 +42,55 @@ export class OllamaClient implements AIClient {
   private baseUrl: string;
 
   constructor(baseUrl: string = 'http://localhost:11434') {
+    // Strict localhost validation for security
+    this.validateLocalhostUrl(baseUrl);
+
     // Remove trailing slash if present
     this.baseUrl = baseUrl.replace(/\/$/, '');
+  }
+
+  /**
+   * Validate that the URL is a local localhost endpoint
+   * This prevents the extension from connecting to remote Ollama instances
+   */
+  private validateLocalhostUrl(url: string): void {
+    try {
+      const parsed = new URL(url);
+
+      // Must use HTTP (not HTTPS) for localhost
+      if (parsed.protocol !== 'http:') {
+        throw new Error(
+          `Invalid protocol: ${parsed.protocol}. Ollama must use http:// (not https://) for localhost.`
+        );
+      }
+
+      // Must be localhost or 127.0.0.1
+      const validHosts = ['localhost', '127.0.0.1', '[::1]'];
+      if (!validHosts.includes(parsed.hostname.toLowerCase())) {
+        throw new Error(
+          `Invalid hostname: ${parsed.hostname}. Ollama must run on localhost, 127.0.0.1, or [::1] for security reasons.`
+        );
+      }
+
+      // Recommended port is 11434 (warn if different)
+      if (parsed.port && parsed.port !== '11434') {
+        console.warn(
+          `[Ollama] Non-standard port detected: ${parsed.port}. Default Ollama port is 11434.`
+        );
+      }
+
+      // No path allowed (except root)
+      if (parsed.pathname && parsed.pathname !== '/') {
+        throw new Error(
+          `Invalid URL: ${url}. Base URL should not include a path (e.g., use http://localhost:11434, not http://localhost:11434/api).`
+        );
+      }
+    } catch (error) {
+      if (error instanceof TypeError) {
+        throw new Error(`Invalid URL format: ${url}. Expected format: http://localhost:11434`);
+      }
+      throw error;
+    }
   }
 
   /**

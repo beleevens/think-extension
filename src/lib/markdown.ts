@@ -34,9 +34,19 @@ export function markdownToHtml(markdown: string): string {
     // Render markdown to HTML
     const rawHtml = md.render(markdown);
 
-    // Sanitize HTML to prevent XSS attacks
-    // DOMPurify removes potentially dangerous elements and attributes
-    const sanitizedHtml = DOMPurify.sanitize(rawHtml);
+    // Sanitize HTML to prevent XSS attacks with strict configuration
+    // Only allow safe HTML tags and attributes that can come from markdown
+    const sanitizedHtml = DOMPurify.sanitize(rawHtml, {
+      ALLOWED_TAGS: [
+        'p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code', 'pre',
+        'blockquote', 'hr', 'table', 'thead', 'tbody', 'tr', 'td', 'th'
+      ],
+      ALLOWED_ATTR: ['href', 'title'],
+      ALLOWED_URI_REGEXP: /^(?:https?|mailto):/, // Only allow http(s) and mailto URLs
+      ALLOW_DATA_ATTR: false,
+      ALLOW_UNKNOWN_PROTOCOLS: false
+    });
 
     return sanitizedHtml;
   } catch (error) {
