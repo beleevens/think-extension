@@ -620,7 +620,7 @@
 
 /* Plugin Manager Layout */
 .plugin-manager-container {
-  padding: 2rem;
+  /* Padding removed - handled by parent settings-section */
 }
 
 .plugin-manager-header {
