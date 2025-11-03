@@ -269,6 +269,18 @@ body,
   @apply text-xs text-muted-foreground/70;
 }
 
+/* Note Context Badge - positioned above input area */
+.note-context-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: hsl(var(--accent));
+  border-top: 1px solid hsl(var(--border));
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 /* Input Area */
 .input-area {
   @apply border-t border-border p-4 flex flex-col gap-2;

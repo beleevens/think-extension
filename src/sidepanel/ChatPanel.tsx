@@ -834,60 +834,6 @@ export function ChatPanel() {
             </div>
           </div>
 
-          {noteTitle && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0.5rem 1rem',
-              backgroundColor: 'hsl(var(--accent))',
-              borderRadius: '0.375rem',
-              marginTop: '0.5rem',
-              gap: '0.5rem'
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                flex: 1,
-                minWidth: 0
-              }}>
-                <FileText size={16} style={{ flexShrink: 0 }} />
-                <span style={{
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}>
-                  Discussing: {noteTitle}
-                </span>
-              </div>
-              <button
-                onClick={closeNoteConversation}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '0.25rem',
-                  color: 'inherit',
-                  opacity: 0.7,
-                  flexShrink: 0
-                }}
-                onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
-                onMouseOut={(e) => (e.currentTarget.style.opacity = '0.7')}
-                title="Close note conversation"
-                aria-label="Close note conversation"
-              >
-                ✕
-              </button>
-            </div>
-          )}
-
           {/* status text hidden; dot below icon is sufficient */}
         </div>
 
@@ -976,6 +922,52 @@ export function ChatPanel() {
 
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Note Context Badge - positioned above input area */}
+      {noteTitle && (
+        <div className="note-context-badge">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            flex: 1,
+            minWidth: 0
+          }}>
+            <FileText size={16} style={{ flexShrink: 0 }} />
+            <span style={{
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
+              Discussing: {noteTitle}
+            </span>
+          </div>
+          <button
+            onClick={closeNoteConversation}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '0.25rem',
+              color: 'inherit',
+              opacity: 0.7,
+              flexShrink: 0
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
+            onMouseOut={(e) => (e.currentTarget.style.opacity = '0.7')}
+            title="Close note conversation"
+            aria-label="Close note conversation"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Input Area */}
       <div className="input-area">
