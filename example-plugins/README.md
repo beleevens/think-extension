@@ -1,10 +1,10 @@
 # Example Custom Plugins
 
-This directory contains example configuration-based plugins that you can import into Think Better to extend its functionality.
+This directory contains example configuration-based plugins that you can import into Think Extension to extend its functionality.
 
 ## What Are Plugins?
 
-Think Better's plugin system allows you to add custom AI-powered processing to your saved notes. Plugins can:
+Think Extension's plugin system allows you to add custom AI-powered processing to your saved notes. Plugins can:
 - Extract specific information (action items, key points, etc.)
 - Generate alternative perspectives (beginner guides, technical deep-dives)
 - Create custom tags and categories
@@ -12,7 +12,7 @@ Think Better's plugin system allows you to add custom AI-powered processing to y
 
 ## Built-in Plugins
 
-Think Better ships with **4 built-in plugins** that are already installed and enabled:
+Think Extension ships with **4 built-in plugins** that are already installed and enabled:
 
 1. **AI Tag Generator** 🏷️ - Automatically generates 7 relevant tags (displayed in header)
 2. **AI Summary Generator** 📝 - Creates 2-3 sentence summaries (displayed in header)
@@ -50,7 +50,7 @@ The example plugins in this directory show you how to create **additional custom
 
 ## How to Import Example Plugins
 
-1. Open Think Better and click the **Settings** icon (⚙️)
+1. Open Think and click the **Settings** icon (⚙️)
 2. Navigate to the **Plugins** section
 3. Click **"Manage Custom Plugins"**
 4. Click **"Import JSON File"**
@@ -346,7 +346,6 @@ Need inspiration? Try creating plugins for:
 ## Questions or Issues?
 
 - Check the main [README.md](../README.md) for general extension help
-- Review [README_DEV.md](../README_DEV.md) for technical details
 - Open an issue on GitHub for bug reports or feature requests
 
 ---

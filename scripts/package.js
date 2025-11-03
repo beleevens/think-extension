@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Package Think Better browser extension for distribution
+ * Package Think Extension for distribution
  * Creates a ZIP file ready for Chrome Web Store or manual installation
  */
 
@@ -35,7 +35,7 @@ try {
 const ZIP_NAME = `think-better-extension-v${version}.zip`;
 const ZIP_PATH = path.join(PACKAGE_DIR, ZIP_NAME);
 
-console.log('📦 Packaging Think Better Extension');
+console.log('📦 Packaging Think Extension');
 console.log('=====================================\n');
 
 // Check if dist exists

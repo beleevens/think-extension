@@ -1,6 +1,6 @@
-# Contributing to Think Better
+# Contributing to Think Extension
 
-Thank you for your interest in contributing to Think Better! We welcome contributions from the community.
+Thank you for your interest in contributing to Think Extension! We welcome contributions from the community.
 
 ## Code of Conduct
 
@@ -70,8 +70,6 @@ We actively welcome pull requests!
    - Enable "Developer mode"
    - Click "Load unpacked"
    - Select the `dist` folder
-
-For detailed development instructions, see [README_DEV.md](README_DEV.md).
 
 ## Code Standards
 
@@ -180,7 +178,6 @@ think-extension/
 ## Getting Help
 
 - Check existing issues and discussions
-- Read [README_DEV.md](README_DEV.md) for technical details
 - Ask questions in GitHub issues
 - Be respectful and patient
 
@@ -192,10 +189,10 @@ Contributors will be recognized in:
 
 ## License
 
-By contributing to Think Better, you agree that your contributions will be licensed under the MIT License.
+By contributing to Think Extension, you agree that your contributions will be licensed under the MIT License.
 
 ## Questions?
 
 Feel free to open an issue with your question or reach out to the maintainers.
 
-Thank you for contributing to Think Better!
+Thank you for contributing to Think Extension!
