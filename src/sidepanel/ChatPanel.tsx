@@ -103,6 +103,7 @@ export function ChatPanel() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODELS.venice);
   const [ollamaEndpoint, setOllamaEndpoint] = useState<string>(DEFAULT_OLLAMA_ENDPOINT);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   // Chat state (conversation messages and input)
   const [messages, setMessages] = useState<Message[]>([]);
@@ -184,6 +185,7 @@ export function ChatPanel() {
       const model = result[modelStorageKey] || DEFAULT_MODELS[provider];
       setSelectedModel(model);
     }
+    setSettingsLoaded(true);
   };
 
   useEffect(() => {
@@ -195,18 +197,20 @@ export function ChatPanel() {
   // Keep input height consistent across states
   // (auto-resize disabled per design)
 
-  // Check for pending context from notes page
+  // Check for pending context/actions from notes page or context menus
   useEffect(() => {
-    const checkPendingContext = async () => {
+    const checkPendingActions = async () => {
       try {
-        const result = await chrome.storage.local.get('pendingChatContext');
+        const result = await chrome.storage.local.get([
+          'pendingChatContext',
+          'pendingSelectionText',
+          'pendingPageShare',
+        ]);
+
+        // Handle pending note context
         if (result.pendingChatContext) {
           const context = result.pendingChatContext as PageContext;
-
-          // Set as active context
           setActiveContext(context);
-
-          // Add system message
           setMessages(prev => [
             ...prev,
             {
@@ -216,28 +220,56 @@ export function ChatPanel() {
               timestamp: Date.now(),
             },
           ]);
-
-          // Clear pending context
           await chrome.storage.local.remove('pendingChatContext');
         }
+
+        // Handle pending selection text
+        if (result.pendingSelectionText) {
+          const selectionText = result.pendingSelectionText as string;
+          const messageId = `sel-${Date.now()}`;
+          const userMessage: Message = {
+            id: messageId,
+            role: 'user',
+            content: `Selected text:\n\n${selectionText}`,
+            timestamp: Date.now(),
+          };
+          setMessages(prev => [...prev, userMessage]);
+          await chrome.storage.local.remove('pendingSelectionText');
+        }
+
+        // Handle pending page share
+        if (result.pendingPageShare) {
+          const pageData = result.pendingPageShare as PageContext;
+          setActiveContext(pageData);
+          setMessages(prev => {
+            setContextAddedAtIndex(prev.length);
+            return [
+              ...prev,
+              {
+                id: `sys-${Date.now()}`,
+                role: 'system',
+                content: `Context: ${pageData.title}`,
+                timestamp: Date.now(),
+              },
+            ];
+          });
+          await chrome.storage.local.remove('pendingPageShare');
+        }
       } catch (error) {
-        console.error('[ChatPanel] Failed to load pending context:', error);
+        console.error('[ChatPanel] Failed to load pending actions:', error);
       }
     };
 
-    checkPendingContext();
+    checkPendingActions();
   }, []);
 
   // Listen for storage changes (in case context is added while panel is open)
   useEffect(() => {
     const handleStorageChange = async (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      // Handle pending note context
       if (changes.pendingChatContext && changes.pendingChatContext.newValue) {
         const context = changes.pendingChatContext.newValue as PageContext;
-
-        // Set as active context
         setActiveContext(context);
-
-        // Add system message
         setMessages(prev => [
           ...prev,
           {
@@ -247,9 +279,40 @@ export function ChatPanel() {
             timestamp: Date.now(),
           },
         ]);
-
-        // Clear pending context
         await chrome.storage.local.remove('pendingChatContext');
+      }
+
+      // Handle selection text from context menu
+      if (changes.pendingSelectionText && changes.pendingSelectionText.newValue) {
+        const selectionText = changes.pendingSelectionText.newValue as string;
+        const messageId = `sel-${Date.now()}`;
+        const userMessage: Message = {
+          id: messageId,
+          role: 'user',
+          content: `Selected text:\n\n${selectionText}`,
+          timestamp: Date.now(),
+        };
+        setMessages(prev => [...prev, userMessage]);
+        await chrome.storage.local.remove('pendingSelectionText');
+      }
+
+      // Handle page share from context menu
+      if (changes.pendingPageShare && changes.pendingPageShare.newValue) {
+        const pageData = changes.pendingPageShare.newValue as PageContext;
+        setActiveContext(pageData);
+        setMessages(prev => {
+          setContextAddedAtIndex(prev.length);
+          return [
+            ...prev,
+            {
+              id: `sys-${Date.now()}`,
+              role: 'system',
+              content: `Context: ${pageData.title}`,
+              timestamp: Date.now(),
+            },
+          ];
+        });
+        await chrome.storage.local.remove('pendingPageShare');
       }
     };
 
@@ -709,6 +772,10 @@ export function ChatPanel() {
 
   const isConnected = activeProvider === 'ollama' || !!apiKey;
   const providerName = getProviderDisplayName(activeProvider);
+  
+  // Determine connection status: unknown if settings haven't loaded, otherwise based on connection
+  const connectionStatus = !settingsLoaded ? 'unknown' : (isConnected ? 'connected' : 'disconnected');
+  const statusTitle = connectionStatus === 'unknown' ? 'Unknown' : (connectionStatus === 'connected' ? 'Connected' : 'Disconnected');
 
   return (
     <>
@@ -730,16 +797,12 @@ export function ChatPanel() {
               <img src={chrome.runtime.getURL('icons/think-os-agent.png')} alt="Think OS Agent" style={{ height: '24px' }} />
               {/* status dot to the right of the icon */}
               <span
-                title={isConnected ? 'Connected' : 'Disconnected'}
-                className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`}
+                title={statusTitle}
+                className={`status-dot ${connectionStatus}`}
                 style={{
                   marginLeft: 6
                 }}
               />
-              {/* provider and model display */}
-              <span className="provider-model-text">
-                {getAbbreviatedProvider(activeProvider)}/{getAbbreviatedModel(selectedModel)}
-              </span>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button
@@ -845,8 +908,7 @@ export function ChatPanel() {
 
         {isConnected && messages.length === 0 && (
           <div className="empty-state">
-            <p>Ready to chat</p>
-            <p className="hint">Powered by {providerName}</p>
+            <p className="ready-to-chat">Ready to chat</p>
             <p className="hint">Ask me anything or share the current page</p>
           </div>
         )}

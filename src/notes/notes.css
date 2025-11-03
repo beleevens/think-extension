@@ -6,11 +6,11 @@
 @layer base {
   :root {
     /* Light mode base (off-white) */
-    --background: 48 86% 98%; /* ≈ #FEFCF5 */
+    --background: 40 100% 99%; /* #FFFEFC */
     --foreground: 222.2 84% 5%;
-    --card: 0 0% 100%;
+    --card: 60 1% 99.8%; /* #fffffe */
     --card-foreground: 222.2 84% 5%;
-    --popover: 0 0% 100%;
+    --popover: 60 1% 99.8%; /* #fffffe */
     --popover-foreground: 222.2 84% 5%;
     --primary: 192 61% 59%;
     --primary-foreground: 210 40% 98%;
@@ -23,7 +23,7 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --input: 40 100% 99%; /* #FFFEFC */
     --ring: 192 61% 59%;
     --radius: 0.5rem;
   }
@@ -139,12 +139,16 @@ html {
 .notes-sidebar {
   width: 320px;
   height: 100%;
-  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+  background: #fffffe;
   border-right: 1px solid hsl(var(--border));
   border-top: none;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+}
+
+.dark .notes-sidebar {
+  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
 }
 
 .notes-header-full {
@@ -156,9 +160,13 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: hsl(var(--background));
+  background: #fffffe;
   width: 100%;
   flex-shrink: 0;
+}
+
+.dark .notes-header-full {
+  background: hsl(var(--background));
 }
 
 .sidebar-header {
@@ -167,6 +175,10 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #fffffe;
+}
+
+.dark .sidebar-header {
   background: hsl(var(--background));
 }
 

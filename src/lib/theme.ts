@@ -9,15 +9,15 @@ const STORAGE_KEY = 'theme';
 
 /**
  * Get current theme from storage
- * Defaults to 'light' if not set
+ * Defaults to 'dark' if not set
  */
 export async function getTheme(): Promise<Theme> {
   try {
     const result = await chrome.storage.local.get(STORAGE_KEY);
-    return (result[STORAGE_KEY] as Theme) || 'light';
+    return (result[STORAGE_KEY] as Theme) || 'dark';
   } catch (error) {
     console.error('[Theme] Failed to get theme:', error);
-    return 'light';
+    return 'dark';
   }
 }
 

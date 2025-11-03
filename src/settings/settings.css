@@ -4,12 +4,12 @@
 
 @layer base {
   :root {
-    /* Light mode: tasteful off-white based on #FEFCF5, with CTA */
-    --background: 48 86% 98%; /* ≈ #FEFCF5 */
+    /* Light mode: tasteful off-white based on #FFFEFC, with CTA */
+    --background: 40 100% 99%; /* #FFFEFC */
     --foreground: 222.2 84% 5%; /* near #0b1220 */
-    --card: 0 0% 100%;
+    --card: 60 1% 99.8%; /* #fffffe */
     --card-foreground: 222.2 84% 5%;
-    --popover: 0 0% 100%;
+    --popover: 60 1% 99.8%; /* #fffffe */
     --popover-foreground: 222.2 84% 5%;
     --primary: 192 61% 59%; /* CTA ≈ #58BED7 */
     --primary-foreground: 210 40% 98%;
@@ -22,7 +22,7 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --input: 40 100% 99%; /* #FFFEFC */
     --ring: 192 61% 59%;
     --radius: 0.5rem;
   }
@@ -83,7 +83,7 @@ html {
 }
 
 .settings-header {
-  background: hsl(var(--background));
+  background: #fffffe;
   border-bottom: 1px solid hsl(var(--border));
   padding: calc(1rem - 1px) 1rem;
   min-height: 62px;
@@ -93,6 +93,10 @@ html {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+}
+
+.dark .settings-header {
+  background: hsl(var(--background));
 }
 
 .settings-header h1 {
@@ -112,7 +116,79 @@ html {
   flex: 1;
   overflow-y: auto;
   background: transparent; /* show gradient */
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Material Design Tabs */
+.md-tabs-container {
+  position: relative;
+  background: #fffffe;
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.dark .md-tabs-container {
+  background: hsl(var(--background));
+}
+
+.md-tabs {
+  display: flex;
+  position: relative;
+  gap: 0;
+  max-width: 100%;
+}
+
+.md-tab {
+  position: relative;
+  min-width: 72px;
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: normal;
+  line-height: 1.5;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  outline: none;
+  white-space: nowrap;
+}
+
+.md-tab:hover {
+  background-color: hsl(var(--muted) / 0.5);
+}
+
+.md-tab:focus-visible {
+  background-color: hsl(var(--muted) / 0.3);
+}
+
+.md-tab-active {
+  color: hsl(var(--primary));
+}
+
+.md-tab-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background-color: hsl(var(--primary));
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.md-tab-content {
+  flex: 1;
+  overflow-y: auto;
   padding: 1rem;
+}
+
+.md-tab-panel {
+  display: block;
 }
 
 .settings-main::-webkit-scrollbar {

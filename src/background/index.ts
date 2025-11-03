@@ -54,17 +54,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   try {
     if (info.menuItemId === 'share-selection' && info.selectionText) {
-      await chrome.runtime.sendMessage({
-        type: 'offscreen.send',
-        message: {
-          type: 'chat.message',
-          id: `sel-${Date.now()}`,
-          content: `Selected text:\n\n${info.selectionText}`,
-          timestamp: Date.now(),
-        },
+      // Store selection text for ChatPanel to pick up
+      await chrome.storage.local.set({
+        pendingSelectionText: info.selectionText,
       });
 
-      chrome.sidePanel.open({ tabId: tab.id });
+      // Open side panel
+      await chrome.sidePanel.open({ tabId: tab.id });
     }
 
     if (info.menuItemId === 'share-page') {
@@ -74,20 +70,16 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         return;
       }
 
+      // Capture page data
       const pageData = await captureCurrentPage();
 
-      await chrome.runtime.sendMessage({
-        type: 'offscreen.send',
-        message: {
-          type: 'page.share',
-          id: `page-${Date.now()}`,
-          pageData,
-          action: 'chat',
-          timestamp: Date.now(),
-        },
+      // Store page data for ChatPanel to pick up
+      await chrome.storage.local.set({
+        pendingPageShare: pageData,
       });
 
-      chrome.sidePanel.open({ tabId: tab.id });
+      // Open side panel
+      await chrome.sidePanel.open({ tabId: tab.id });
     }
 
     if (info.menuItemId === 'open-notes') {
