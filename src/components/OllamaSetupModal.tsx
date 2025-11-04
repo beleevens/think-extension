@@ -51,69 +51,122 @@ export function OllamaSetupModal({ isOpen, onClose }: OllamaSetupModalProps) {
                 minHeight: 0
               }}
             >
+              {/* Security Warning */}
+              <div
+                className="p-4 rounded-md"
+                style={{
+                  backgroundColor: 'hsl(var(--destructive) / 0.1)',
+                  border: '2px solid hsl(var(--destructive))',
+                }}
+              >
+                <div className="text-sm font-semibold mb-2" style={{ color: 'hsl(var(--destructive))' }}>
+                  ⚠️ Important Security Information
+                </div>
+                <p className="text-sm" style={{ color: 'hsl(var(--foreground))', lineHeight: '1.5' }}>
+                  Ollama runs locally on your machine and requires CORS configuration. We provide two options below:
+                  a <strong>secure option</strong> (recommended) that only allows this extension, and a
+                  <strong> permissive option</strong> that allows all applications. Choose based on your security needs.
+                </p>
+              </div>
+
               {/* Step 1: Enable CORS */}
               <div>
                 <h3 className="text-base font-semibold mb-3" style={{ color: 'hsl(var(--foreground))' }}>
                   Step 1: Enable CORS for Browser Extension
                 </h3>
                 <p className="text-sm mb-3" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                  Ollama needs to allow requests from browser extensions. Run this command in your terminal:
+                  Ollama needs to allow requests from browser extensions. Choose one of the following options:
                 </p>
 
-                {/* macOS/Linux */}
-                <div className="mb-3">
-                  <div className="text-sm font-medium mb-1" style={{ color: 'hsl(var(--foreground))' }}>
-                    macOS / Linux:
+                {/* Option A: Secure (Recommended) */}
+                <div className="mb-4 p-3 rounded-md" style={{ backgroundColor: 'hsl(var(--accent))', border: '1px solid hsl(var(--border))' }}>
+                  <div className="text-sm font-semibold mb-2" style={{ color: 'hsl(var(--foreground))' }}>
+                    ✅ Option A: Secure (Recommended)
                   </div>
-                  <code
-                    className="block text-sm px-3 py-2 rounded-md font-mono"
-                    style={{
-                      color: 'hsl(var(--foreground))',
-                      backgroundColor: 'hsl(var(--muted))',
-                      border: '1px solid hsl(var(--border))',
-                    }}
-                  >
-                    export OLLAMA_ORIGINS="*"
-                  </code>
-                </div>
-
-                {/* Windows */}
-                <div>
-                  <div className="text-sm font-medium mb-1" style={{ color: 'hsl(var(--foreground))' }}>
-                    Windows (PowerShell):
-                  </div>
-                  <code
-                    className="block text-sm px-3 py-2 rounded-md font-mono"
-                    style={{
-                      color: 'hsl(var(--foreground))',
-                      backgroundColor: 'hsl(var(--muted))',
-                      border: '1px solid hsl(var(--border))',
-                    }}
-                  >
-                    $env:OLLAMA_ORIGINS="*"
-                  </code>
-                </div>
-
-                {/* What does this do explanation */}
-                <div
-                  className="mt-3 p-3 rounded-md text-sm"
-                  style={{
-                    backgroundColor: 'hsl(var(--accent))',
-                    border: '1px solid hsl(var(--border))',
-                  }}
-                >
-                  <div style={{ marginBottom: '8px' }}>
-                    <strong style={{ color: 'hsl(var(--foreground))' }}>What does this command do?</strong>
-                  </div>
-                  <p style={{ color: 'hsl(var(--muted-foreground))', marginBottom: '8px' }}>
-                    This allows Ollama to accept requests from browser extensions.
-                    The <code style={{ backgroundColor: 'hsl(var(--muted))', padding: '2px 4px', borderRadius: '4px' }}>*</code> means
-                    "allow all origins" - this lets any application on your computer connect to Ollama.
+                  <p className="text-sm mb-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                    Only allow this extension to access Ollama:
                   </p>
-                  <p style={{ color: 'hsl(var(--muted-foreground))', margin: 0 }}>
-                    <strong>Security note:</strong> This is safe for normal use since Ollama only runs on your computer by default.
-                    However, if you've configured Ollama to be accessible from other computers on your network,
-                    you may want to use a more restrictive setting.
+
+                  {/* macOS/Linux */}
+                  <div className="mb-2">
+                    <div className="text-xs font-medium mb-1" style={{ color: 'hsl(var(--foreground))' }}>
+                      macOS / Linux:
+                    </div>
+                    <code
+                      className="block text-xs px-3 py-2 rounded-md font-mono break-all"
+                      style={{
+                        color: 'hsl(var(--foreground))',
+                        backgroundColor: 'hsl(var(--muted))',
+                        border: '1px solid hsl(var(--border))',
+                      }}
+                    >
+                      export OLLAMA_ORIGINS="chrome-extension://{chrome.runtime.id}"
+                    </code>
+                  </div>
+
+                  {/* Windows */}
+                  <div>
+                    <div className="text-xs font-medium mb-1" style={{ color: 'hsl(var(--foreground))' }}>
+                      Windows (PowerShell):
+                    </div>
+                    <code
+                      className="block text-xs px-3 py-2 rounded-md font-mono break-all"
+                      style={{
+                        color: 'hsl(var(--foreground))',
+                        backgroundColor: 'hsl(var(--muted))',
+                        border: '1px solid hsl(var(--border))',
+                      }}
+                    >
+                      $env:OLLAMA_ORIGINS="chrome-extension://{chrome.runtime.id}"
+                    </code>
+                  </div>
+                </div>
+
+                {/* Option B: Permissive */}
+                <div className="mb-3 p-3 rounded-md" style={{ backgroundColor: 'hsl(var(--muted))', border: '1px solid hsl(var(--border))' }}>
+                  <div className="text-sm font-semibold mb-2" style={{ color: 'hsl(var(--foreground))' }}>
+                    ⚡ Option B: Permissive (Easier but less secure)
+                  </div>
+                  <p className="text-sm mb-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                    Allow all applications to access Ollama (simpler but allows any app on your computer):
+                  </p>
+
+                  {/* macOS/Linux */}
+                  <div className="mb-2">
+                    <div className="text-xs font-medium mb-1" style={{ color: 'hsl(var(--foreground))' }}>
+                      macOS / Linux:
+                    </div>
+                    <code
+                      className="block text-xs px-3 py-2 rounded-md font-mono"
+                      style={{
+                        color: 'hsl(var(--foreground))',
+                        backgroundColor: 'hsl(var(--background))',
+                        border: '1px solid hsl(var(--border))',
+                      }}
+                    >
+                      export OLLAMA_ORIGINS="*"
+                    </code>
+                  </div>
+
+                  {/* Windows */}
+                  <div>
+                    <div className="text-xs font-medium mb-1" style={{ color: 'hsl(var(--foreground))' }}>
+                      Windows (PowerShell):
+                    </div>
+                    <code
+                      className="block text-xs px-3 py-2 rounded-md font-mono"
+                      style={{
+                        color: 'hsl(var(--foreground))',
+                        backgroundColor: 'hsl(var(--background))',
+                        border: '1px solid hsl(var(--border))',
+                      }}
+                    >
+                      $env:OLLAMA_ORIGINS="*"
+                    </code>
+                  </div>
+
+                  <p className="text-xs mt-2" style={{ color: 'hsl(var(--muted-foreground))', fontStyle: 'italic' }}>
+                    ⚠️ With this option, any website or app on your computer can send requests to Ollama. This is generally safe for localhost-only Ollama, but Option A is more secure.
                   </p>
                 </div>
               </div>
@@ -183,19 +236,45 @@ export function OllamaSetupModal({ isOpen, onClose }: OllamaSetupModalProps) {
                 <div className="text-sm font-semibold mb-2" style={{ color: 'hsl(var(--foreground))' }}>
                   💡 Tip: Make it Permanent
                 </div>
-                <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                  To avoid setting <code style={{ backgroundColor: 'hsl(var(--muted))', padding: '2px 4px', borderRadius: '4px' }}>OLLAMA_ORIGINS</code> every time, add it to your shell profile:
+                <p className="text-sm mb-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                  To avoid setting <code style={{ backgroundColor: 'hsl(var(--muted))', padding: '2px 4px', borderRadius: '4px' }}>OLLAMA_ORIGINS</code> every time, add it to your shell profile.
+                  Choose the command that matches your chosen option above:
                 </p>
-                <code
-                  className="block text-sm px-3 py-2 rounded-md font-mono mt-2"
-                  style={{
-                    color: 'hsl(var(--foreground))',
-                    backgroundColor: 'hsl(var(--muted))',
-                    border: '1px solid hsl(var(--border))',
-                  }}
-                >
-                  echo 'export OLLAMA_ORIGINS="*"' &gt;&gt; ~/.zshrc
-                </code>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs font-medium mb-1" style={{ color: 'hsl(var(--foreground))' }}>
+                      For Option A (Secure - Recommended):
+                    </p>
+                    <code
+                      className="block text-xs px-3 py-2 rounded-md font-mono break-all"
+                      style={{
+                        color: 'hsl(var(--foreground))',
+                        backgroundColor: 'hsl(var(--muted))',
+                        border: '1px solid hsl(var(--border))',
+                      }}
+                    >
+                      echo 'export OLLAMA_ORIGINS="chrome-extension://{chrome.runtime.id}"' &gt;&gt; ~/.zshrc
+                    </code>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium mb-1" style={{ color: 'hsl(var(--foreground))' }}>
+                      For Option B (Permissive):
+                    </p>
+                    <code
+                      className="block text-xs px-3 py-2 rounded-md font-mono"
+                      style={{
+                        color: 'hsl(var(--foreground))',
+                        backgroundColor: 'hsl(var(--muted))',
+                        border: '1px solid hsl(var(--border))',
+                      }}
+                    >
+                      echo 'export OLLAMA_ORIGINS="*"' &gt;&gt; ~/.zshrc
+                    </code>
+                  </div>
+                  <p className="text-xs" style={{ color: 'hsl(var(--muted-foreground))', fontStyle: 'italic' }}>
+                    Note: If you use a different shell (bash, fish, etc.), replace <code style={{ backgroundColor: 'hsl(var(--muted))', padding: '2px 4px', borderRadius: '4px' }}>~/.zshrc</code> with your shell's config file.
+                  </p>
+                </div>
               </div>
             </div>
 
