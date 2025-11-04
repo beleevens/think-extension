@@ -157,6 +157,13 @@ class PluginManager {
    * Returns pluginData object with results from each plugin
    */
   async processNote(input: NoteInput): Promise<Record<string, any>> {
+    // Auto-load plugins if not registered yet (fixes cross-context execution)
+    if (this.plugins.size === 0) {
+      const result = await chrome.storage.local.get('configPlugins');
+      const configPlugins = (result.configPlugins || []) as Plugin[];
+      configPlugins.forEach(plugin => this.register(plugin));
+    }
+
     const storage = await chrome.storage.local.get('plugins');
     const pluginStates = (storage.plugins || {}) as PluginStorage;
 

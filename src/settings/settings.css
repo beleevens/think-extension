@@ -408,7 +408,7 @@ html {
   }
 }
 
-@keyframes rotate {
+@keyframes spin {
   from {
     transform: rotate(0deg);
   }
@@ -418,7 +418,7 @@ html {
 }
 
 .spin {
-  animation: rotate 1s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
 .message.success {

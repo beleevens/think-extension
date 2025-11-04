@@ -147,10 +147,10 @@ function DisplayRendererInner({ display, data, pluginName, position = 'header', 
  */
 function BlocksAccordion({ data, plugin }: { data: Record<string, string>; plugin?: ConfigPlugin }) {
   const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>(() => {
-    // Expand all blocks by default
+    // Collapse all blocks by default
     const initial: Record<string, boolean> = {};
     Object.keys(data).forEach(blockId => {
-      initial[blockId] = true;
+      initial[blockId] = false;
     });
     return initial;
   });
