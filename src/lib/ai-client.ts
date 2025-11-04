@@ -6,6 +6,7 @@
 import { VeniceClient } from './venice-client';
 import { ClaudeClient } from './claude-client';
 import { OllamaClient } from './ollama-client';
+import { decryptValue, migrateToEncrypted } from './crypto';
 
 export type AIProvider = 'venice' | 'claude' | 'ollama';
 
@@ -112,7 +113,26 @@ export async function loadProviderSettings(): Promise<ProviderConfig | null> {
 
   // Get API key for the provider
   const apiKeyStorageKey = getStorageKeyForApiKey(provider);
-  const apiKey = apiKeyStorageKey ? result[apiKeyStorageKey] || '' : '';
+  let encryptedKey = apiKeyStorageKey ? result[apiKeyStorageKey] || '' : '';
+
+  let apiKey = '';
+  if (encryptedKey && provider !== 'ollama') {
+    try {
+      // Migrate plain text keys to encrypted format
+      const migratedKey = await migrateToEncrypted(encryptedKey);
+      if (migratedKey !== encryptedKey) {
+        // Key was migrated, save it back
+        await chrome.storage.local.set({ [apiKeyStorageKey]: migratedKey });
+        encryptedKey = migratedKey;
+      }
+
+      // Decrypt the API key
+      apiKey = await decryptValue(encryptedKey);
+    } catch (error) {
+      console.error('[AIClient] Failed to decrypt API key:', error);
+      return null;
+    }
+  }
 
   // Get model for the provider
   const modelStorageKey = getStorageKeyForModel(provider);

@@ -17,6 +17,7 @@ import { registerBuiltInPlugins, listenToPluginChanges } from '../plugins/regist
 import { PluginsSection } from './PluginsSection';
 import { VariablesSection } from './VariablesSection';
 import { MasterPromptsSection } from './MasterPromptsSection';
+import { encryptValue, decryptValue, validateApiKeyFormat, migrateToEncrypted } from '../lib/crypto';
 import './settings.css';
 
 type ConnectionStatus = 'unknown' | 'testing' | 'available' | 'unavailable';
@@ -205,10 +206,27 @@ function SettingsPage() {
       testConnection('', provider, endpoint);
     } else {
       const apiKeyStorageKey = getStorageKeyForApiKey(provider);
-      const key = apiKeyStorageKey ? result[apiKeyStorageKey] : null;
+      let key = apiKeyStorageKey ? result[apiKeyStorageKey] : null;
+
       if (key) {
-        setApiKey(key);
-        testConnection(key, provider);
+        try {
+          // Migrate plain text keys to encrypted format
+          const migratedKey = await migrateToEncrypted(key);
+          if (migratedKey !== key) {
+            // Key was migrated, save it back
+            await chrome.storage.local.set({ [apiKeyStorageKey]: migratedKey });
+            key = migratedKey;
+          }
+
+          // Decrypt the key for display and testing
+          const decryptedKey = await decryptValue(key);
+          setApiKey(decryptedKey);
+          testConnection(decryptedKey, provider);
+        } catch (error) {
+          console.error('[Settings] Failed to decrypt API key:', error);
+          setSaveMessage({ type: 'error', text: 'Failed to load API key - may be corrupted' });
+          setApiKey('');
+        }
       }
     }
 
@@ -300,8 +318,18 @@ function SettingsPage() {
   };
 
   const handleSaveApiKey = async () => {
-    if (!apiKey.trim()) {
+    const trimmedKey = apiKey.trim();
+
+    if (!trimmedKey) {
       setSaveMessage({ type: 'error', text: 'Please enter an API key' });
+      return;
+    }
+
+    // Validate API key format
+    const providerType = activeProvider === 'venice' ? 'venice' : 'claude';
+    const validation = validateApiKeyFormat(trimmedKey, providerType);
+    if (!validation.valid) {
+      setSaveMessage({ type: 'error', text: validation.error || 'Invalid API key format' });
       return;
     }
 
@@ -309,20 +337,26 @@ function SettingsPage() {
     setSaveMessage(null);
 
     try {
+      // Encrypt the API key before saving
+      const encryptedKey = await encryptValue(trimmedKey);
+
       // Save to the appropriate storage key based on active provider
       const storageKey = getStorageKeyForApiKey(activeProvider);
       if (!storageKey) {
         throw new Error(`No API key storage for provider: ${activeProvider}`);
       }
+
       await chrome.storage.local.set({
-        [storageKey]: apiKey.trim(),
+        [storageKey]: encryptedKey,
         activeProvider: activeProvider,
       });
-      setSaveMessage({ type: 'success', text: 'API key saved successfully' });
+
+      setSaveMessage({ type: 'success', text: 'API key saved securely' });
       setTimeout(() => setSaveMessage(null), 3000);
 
       testConnection();
     } catch (error) {
+      console.error('[Settings] Failed to save API key:', error);
       setSaveMessage({ type: 'error', text: 'Failed to save API key' });
     } finally {
       setSaving(false);
@@ -382,12 +416,27 @@ function SettingsPage() {
       const modelStorageKey = getStorageKeyForModel(newProvider);
 
       const result = await chrome.storage.local.get([apiKeyStorageKey, modelStorageKey]);
-      const key = apiKeyStorageKey ? result[apiKeyStorageKey] : null;
+      let key = apiKeyStorageKey ? result[apiKeyStorageKey] : null;
       const model = result[modelStorageKey];
 
       if (key) {
-        setApiKey(key);
-        testConnection(key, newProvider);
+        try {
+          // Migrate and decrypt the key
+          const migratedKey = await migrateToEncrypted(key);
+          if (migratedKey !== key) {
+            await chrome.storage.local.set({ [apiKeyStorageKey]: migratedKey });
+            key = migratedKey;
+          }
+
+          const decryptedKey = await decryptValue(key);
+          setApiKey(decryptedKey);
+          testConnection(decryptedKey, newProvider);
+        } catch (error) {
+          console.error('[Settings] Failed to decrypt API key:', error);
+          setApiKey('');
+          setConnectionStatus('unknown');
+          setAvailableModels([]);
+        }
       } else {
         setApiKey('');
         setConnectionStatus('unknown');
