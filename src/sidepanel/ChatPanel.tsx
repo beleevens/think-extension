@@ -20,6 +20,7 @@ import type { Message, PageContext } from '../lib/types';
 import { saveConversation, getConversationByNoteId } from '../lib/conversation-storage';
 import { getNote } from '../lib/local-notes';
 import { markdownToHtml } from '../lib/markdown';
+import { decryptValue, migrateToEncrypted } from '../lib/crypto';
 
 /**
  * Abbreviate provider name for compact display
@@ -176,8 +177,20 @@ export function ChatPanel() {
       setSelectedModel(model);
     } else {
       const apiKeyStorageKey = getStorageKeyForApiKey(provider);
-      const key = apiKeyStorageKey ? result[apiKeyStorageKey] : null;
-      setApiKey(key || null);
+      const encryptedKey = apiKeyStorageKey ? result[apiKeyStorageKey] : null;
+
+      let decryptedKey = null;
+      if (encryptedKey) {
+        try {
+          // Decrypt the API key
+          decryptedKey = await decryptValue(encryptedKey);
+        } catch (error) {
+          console.error('[ChatPanel] Failed to decrypt API key:', error);
+          decryptedKey = null;
+        }
+      }
+
+      setApiKey(decryptedKey);
 
       // Load selected model for active provider
       const modelStorageKey = getStorageKeyForModel(provider);
