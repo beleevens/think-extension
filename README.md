@@ -1,21 +1,21 @@
-# Think - AI Notes Extension
+# Think - AI Memories Extension
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/beleevens/think-extension/releases)
 
-> AI-powered note taking Chrome extension with Venice.ai, Claude, and Ollama (local). No account required - all notes stored locally in your browser.
+> AI-powered memory taking Chrome extension with Venice.ai, Claude, and Ollama (local). No account required - all memories stored locally in your browser.
 
 ## What is Think Extension?
 
-Think Extension is a Chrome extension that brings AI-powered note-taking directly to your browser. Capture notes from any webpage, chat with AI, get automatic summaries and tags, and keep everything organized locally.
+Think Extension is a Chrome extension that brings AI-powered memory-taking directly to your browser. Capture memories from any webpage, chat with AI, get automatic summaries and tags, and keep everything organized locally.
 
 ## Key Features
 
 - **AI Chat** - Real-time streaming chat with Venice.ai, Claude, or Ollama (local)
-- **Smart Note Taking** - Save any webpage with automatic summaries and smart tagging
-- **Custom Plugins** - Extensible plugin system for processing notes with AI
-- **100% Local Storage** - All notes stored in your browser (no cloud sync)
-- **Export/Import** - Backup notes as JSON or export as Markdown
+- **Smart Memory Taking** - Save any webpage with automatic summaries and smart tagging
+- **Custom Plugins** - Extensible plugin system for processing memories with AI
+- **100% Local Storage** - All memories stored in your browser (no cloud sync)
+- **Export/Import** - Backup memories as JSON or export as Markdown
 
 ---
 
@@ -36,7 +36,7 @@ Think Extension is a Chrome extension that brings AI-powered note-taking directl
 
 **Pin the Extension (Optional):**
 1. Click the extensions icon (puzzle piece) in your Chrome toolbar
-2. Find "Think - AI Notes"
+2. Find "Think - AI Memories"
 3. Click the pin icon to keep it visible in your toolbar
 
 ### Option 2: Build from Source
