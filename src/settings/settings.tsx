@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Loader2, Check } from 'lucide-react';
+import { Loader2, Check, Eye, EyeOff } from 'lucide-react';
 import {
   createAIClient,
   type AIProvider,
@@ -11,9 +11,8 @@ import {
   DEFAULT_MODELS,
 } from '../lib/ai-client';
 import { getNoteCount, getStorageUsage, exportNotes, importNotes, clearAllNotes, exportNotesAsMarkdown, getStorageBreakdown, type StorageBreakdown } from '../lib/local-notes';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { OllamaSetupModal } from '../components/OllamaSetupModal';
-import { initTheme, listenToThemeChanges } from '../lib/theme';
+import { initTheme, listenToThemeChanges, getTheme, type Theme } from '../lib/theme';
 import { registerBuiltInPlugins, listenToPluginChanges } from '../plugins/registry';
 import { PluginsSection } from './PluginsSection';
 import { VariablesSection } from './VariablesSection';
@@ -87,8 +86,29 @@ function SettingsPage() {
   // Modal state
   const [showOllamaSetup, setShowOllamaSetup] = useState<boolean>(false);
 
+  // Tab state
+  const [activeTab, setActiveTab] = useState<'agent' | 'notes' | 'plugins' | 'storage'>('agent');
+  const [indicatorStyle, setIndicatorStyle] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
+  const tabRefs = {
+    agent: useRef<HTMLButtonElement>(null),
+    notes: useRef<HTMLButtonElement>(null),
+    plugins: useRef<HTMLButtonElement>(null),
+    storage: useRef<HTMLButtonElement>(null),
+  };
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Theme state for conditional icon rendering - initialize from storage
+  const [theme, setTheme] = useState<Theme>('dark'); // Default to dark, will be updated immediately
+
   useEffect(() => {
-    initTheme(); // Initialize dark mode on mount
+    // Initialize theme and update state
+    const initializeTheme = async () => {
+      await initTheme(); // Initialize dark mode on mount
+      const currentTheme = await getTheme(); // Get the actual theme from storage
+      setTheme(currentTheme);
+    };
+    
+    initializeTheme();
     loadSettings();
     loadNotesStatistics();
 
@@ -104,7 +124,9 @@ function SettingsPage() {
       });
 
     // Listen for theme changes from other pages
-    const themeCleanup = listenToThemeChanges();
+    const themeCleanup = listenToThemeChanges((newTheme) => {
+      setTheme(newTheme);
+    });
 
     // Listen for plugin changes (hot-reload)
     const pluginCleanup = listenToPluginChanges(() => {
@@ -115,6 +137,26 @@ function SettingsPage() {
       pluginCleanup();
     };
   }, []);
+
+  // Update indicator position when active tab changes
+  useEffect(() => {
+    const updateIndicator = () => {
+      const activeTabRef = tabRefs[activeTab];
+      const container = tabsContainerRef.current;
+      if (activeTabRef.current && container) {
+        const tabRect = activeTabRef.current.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        setIndicatorStyle({
+          left: tabRect.left - containerRect.left,
+          width: tabRect.width,
+        });
+      }
+    };
+
+    updateIndicator();
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [activeTab]);
 
   // Scroll to section if hash is present in URL
   useEffect(() => {
@@ -479,10 +521,15 @@ function SettingsPage() {
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
   };
 
-  const openNotesPage = () => {
-    chrome.tabs.create({
-      url: chrome.runtime.getURL('src/notes/notes.html'),
-    });
+  const openNotesPage = async () => {
+    const notesUrl = chrome.runtime.getURL('src/notes/notes.html');
+    const tabs = await chrome.tabs.query({ url: notesUrl });
+    if (tabs.length > 0 && tabs[0].id) {
+      await chrome.tabs.update(tabs[0].id, { active: true });
+      await chrome.windows.update(tabs[0].windowId!, { focused: true });
+    } else {
+      await chrome.tabs.create({ url: notesUrl });
+    }
   };
 
   const getStatusBadge = (status: ConnectionStatus) => {
@@ -520,16 +567,67 @@ function SettingsPage() {
         <header className="settings-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <img src={chrome.runtime.getURL('branding/Think_OS_Full_Word_Mark.svg')} alt="Think OS" style={{ height: '20px' }} />
+            <img 
+              src={chrome.runtime.getURL(theme === 'light' ? 'branding/Think_OS_Full_Word_Mark-lightmode.svg' : 'branding/Think_OS_Full_Word_Mark.svg')} 
+              alt="Think OS" 
+              style={{ height: '20px', width: 'auto', display: 'block' }} 
+            />
             <h2 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 'normal', lineHeight: '1.5' }}>Settings</h2>
           </div>
-          <ThemeToggle />
         </div>
       </header>
 
       <main className="settings-main">
-        {/* AI Provider Selection */}
-        <section className="settings-section">
+        {/* Material Design Tabs */}
+        <div className="md-tabs-container" ref={tabsContainerRef}>
+          <div className="md-tabs">
+            <button
+              ref={tabRefs.agent}
+              className={`md-tab ${activeTab === 'agent' ? 'md-tab-active' : ''}`}
+              onClick={() => setActiveTab('agent')}
+              role="tab"
+              aria-selected={activeTab === 'agent'}
+            >
+              Agent
+            </button>
+            <button
+              ref={tabRefs.notes}
+              className={`md-tab ${activeTab === 'notes' ? 'md-tab-active' : ''}`}
+              onClick={() => setActiveTab('notes')}
+              role="tab"
+              aria-selected={activeTab === 'notes'}
+            >
+              Notes
+            </button>
+            <button
+              ref={tabRefs.plugins}
+              className={`md-tab ${activeTab === 'plugins' ? 'md-tab-active' : ''}`}
+              onClick={() => setActiveTab('plugins')}
+              role="tab"
+              aria-selected={activeTab === 'plugins'}
+            >
+              Plugins
+            </button>
+            <button
+              ref={tabRefs.storage}
+              className={`md-tab ${activeTab === 'storage' ? 'md-tab-active' : ''}`}
+              onClick={() => setActiveTab('storage')}
+              role="tab"
+              aria-selected={activeTab === 'storage'}
+            >
+              Storage
+            </button>
+          </div>
+          <div className="md-tab-indicator" style={{ left: `${indicatorStyle.left}px`, width: `${indicatorStyle.width}px` }}></div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="md-tab-content">
+          {/* Agent Tab */}
+          {activeTab === 'agent' && (
+            <div className="md-tab-panel">
+              {/* AI Provider Selection */}
+              <section className="settings-section">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <h2 style={{ margin: 0 }}>AI Provider</h2>
             {getStatusBadge(connectionStatus)}
@@ -670,7 +768,7 @@ function SettingsPage() {
                     className="toggle-visibility-btn"
                     title={showApiKey ? 'Hide API key' : 'Show API key'}
                   >
-                    {showApiKey ? '👁️' : '👁️‍🗨️'}
+                    {showApiKey ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
                 </div>
               </div>
@@ -786,74 +884,87 @@ function SettingsPage() {
               </>
             )}
           </p>
-        </section>
+              </section>
 
-        {/* Behavior Settings Section */}
-        <section id="behavior" className="settings-section">
-          <h2>Behavior Settings</h2>
-          <div style={{ marginTop: '1rem' }}>
-            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={autoOpenNoteConversation}
-                onChange={async (e) => {
-                  const newValue = e.target.checked;
-                  setAutoOpenNoteConversation(newValue);
-                  try {
-                    await chrome.storage.local.set({ autoOpenNoteConversation: newValue });
-                    setSaveMessage({ type: 'success', text: 'Setting saved' });
-                    setTimeout(() => setSaveMessage(null), 3000);
-                  } catch (error) {
-                    console.error('[Settings] Failed to save setting:', error);
-                    setSaveMessage({ type: 'error', text: 'Failed to save setting' });
-                    setTimeout(() => setSaveMessage(null), 3000);
-                  }
-                }}
-                style={{ marginTop: '0.25rem', cursor: 'pointer' }}
-              />
-              <div style={{ flex: 1 }}>
-                <span style={{ fontWeight: '500', display: 'block', marginBottom: '0.25rem' }}>
-                  Auto-open conversation when clicking a note
-                </span>
-                <p className="help-text" style={{ margin: 0, fontSize: '0.875rem' }}>
-                  When enabled, clicking a note will automatically open its conversation in the side panel.
-                  When disabled, you'll need to click the "Open Conversation" button to view a note's chat history.
-                </p>
-              </div>
-            </label>
-          </div>
-        </section>
+              {/* Master Prompts Section */}
+              <InitGuard isInitialized={pluginsInitialized} error={pluginInitError}>
+                <MasterPromptsSection />
+              </InitGuard>
 
-        {/* Plugins Section */}
-        <InitGuard isInitialized={pluginsInitialized} error={pluginInitError}>
-          <PluginsSection />
-        </InitGuard>
+              {/* Variables Section */}
+              <InitGuard isInitialized={pluginsInitialized} error={pluginInitError}>
+                <VariablesSection />
+              </InitGuard>
+            </div>
+          )}
 
-        {/* Variables Section */}
-        <InitGuard isInitialized={pluginsInitialized} error={pluginInitError}>
-          <VariablesSection />
-        </InitGuard>
+          {/* Notes Tab */}
+          {activeTab === 'notes' && (
+            <div className="md-tab-panel">
+              <section id="behavior" className="settings-section">
+                <h2>Behavior Settings</h2>
+                <div style={{ marginTop: '1rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={autoOpenNoteConversation}
+                      onChange={async (e) => {
+                        const newValue = e.target.checked;
+                        setAutoOpenNoteConversation(newValue);
+                        try {
+                          await chrome.storage.local.set({ autoOpenNoteConversation: newValue });
+                          setSaveMessage({ type: 'success', text: 'Setting saved' });
+                          setTimeout(() => setSaveMessage(null), 3000);
+                        } catch (error) {
+                          console.error('[Settings] Failed to save setting:', error);
+                          setSaveMessage({ type: 'error', text: 'Failed to save setting' });
+                          setTimeout(() => setSaveMessage(null), 3000);
+                        }
+                      }}
+                      style={{ marginTop: '0.25rem', cursor: 'pointer' }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontWeight: '500', display: 'block', marginBottom: '0.25rem' }}>
+                        Auto-open conversation when clicking a note
+                      </span>
+                      <p className="help-text" style={{ margin: 0, fontSize: '0.875rem' }}>
+                        When enabled, clicking a note will automatically open its conversation in the side panel.
+                        When disabled, you'll need to click the "Open Conversation" button to view a note's chat history.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </section>
+            </div>
+          )}
 
-        {/* Master Prompts Section */}
-        <InitGuard isInitialized={pluginsInitialized} error={pluginInitError}>
-          <MasterPromptsSection />
-        </InitGuard>
+          {/* Plugins Tab */}
+          {activeTab === 'plugins' && (
+            <div className="md-tab-panel">
+              <InitGuard isInitialized={pluginsInitialized} error={pluginInitError}>
+                <PluginsSection />
+              </InitGuard>
+            </div>
+          )}
 
-        {/* Info Section */}
-        <section className="settings-section info-section">
-          <h2>About Privacy & Storage</h2>
-          <ul className="info-list">
-            <li><strong>Local-First:</strong> All your notes are stored in Chrome's local storage on your device.</li>
-            <li><strong>No Account Required:</strong> No sign-up, no login, no cloud sync.</li>
-            <li><strong>AI Processing:</strong> When using AI features, note content is sent to your selected AI provider for processing.</li>
-            <li><strong>Backup:</strong> Export your notes regularly to prevent data loss if browser data is cleared.</li>
-            <li><strong>Privacy:</strong> We don't collect any data. Your API key and notes stay on your device.</li>
-          </ul>
-        </section>
+          {/* Storage Tab */}
+          {activeTab === 'storage' && (
+            <div className="md-tab-panel">
+              {/* Info Section */}
+              <section className="settings-section info-section">
+                <h2>About Privacy & Storage</h2>
+                <ul className="info-list">
+                  <li><strong>Local-First:</strong> All your notes are stored in Chrome's local storage on your device.</li>
+                  <li><strong>No Account Required:</strong> No sign-up, no login, no cloud sync.</li>
+                  <li><strong>AI Processing:</strong> When using AI features, note content is sent to your selected AI provider for processing.</li>
+                  <li><strong>Backup:</strong> Export your notes regularly to prevent data loss if browser data is cleared.</li>
+                  <li><strong>Privacy:</strong> We don't collect any data. Your API key and notes stay on your device.</li>
+                </ul>
+              </section>
 
-        {/* Local Storage Section */}
-        <section className="settings-section">
-          <h2>Local Storage & Data</h2>
+              {/* Local Storage Section */}
+              <section className="settings-section">
+                <h2>Local Storage & Data</h2>
           <p className="help-text">
             All your data is stored locally in your browser using Chrome storage. This includes notes, conversations, settings, plugins, and variables. Your data never leaves your device unless you explicitly export it.
           </p>
@@ -993,9 +1104,12 @@ function SettingsPage() {
               <p className="help-text" style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>
                 Warning: This will permanently delete all {notesCount} notes. Export first to backup!
               </p>
+              </div>
             </div>
-          </div>
-        </section>
+              </section>
+            </div>
+          )}
+        </div>
       </main>
     </div>
     </>

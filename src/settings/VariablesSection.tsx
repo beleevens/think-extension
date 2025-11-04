@@ -351,7 +351,7 @@ export function VariablesSection() {
         <h3 style={{ fontSize: '1rem', fontWeight: 500, marginBottom: '1rem' }}>
           How to Use Variables
         </h3>
-        <ul style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))', paddingLeft: '1.5rem', margin: 0 }}>
+        <ul style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))', padding: 0, margin: 0 }}>
           <li style={{ marginBottom: '0.5rem' }}>
             Create variables with an ID (e.g., <code>myproduct</code>), title, and content
           </li>

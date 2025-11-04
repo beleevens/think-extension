@@ -6,11 +6,11 @@
 @layer base {
   :root {
     /* Light mode base (off-white) */
-    --background: 48 86% 98%; /* ≈ #FEFCF5 */
+    --background: 40 100% 99%; /* #FFFEFC */
     --foreground: 222.2 84% 5%;
-    --card: 0 0% 100%;
+    --card: 60 1% 99.8%; /* #fffffe */
     --card-foreground: 222.2 84% 5%;
-    --popover: 0 0% 100%;
+    --popover: 60 1% 99.8%; /* #fffffe */
     --popover-foreground: 222.2 84% 5%;
     --primary: 192 61% 59%;
     --primary-foreground: 210 40% 98%;
@@ -23,7 +23,7 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --input: 60 1% 99.8%; /* #fffffe */
     --ring: 192 61% 59%;
     --radius: 0.5rem;
   }
@@ -61,9 +61,13 @@ body {
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+  background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
   color: hsl(var(--foreground));
   overflow: hidden; /* Hide browser scrollbar */
+}
+
+.dark body {
+  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
 }
 
 body::-webkit-scrollbar {
@@ -139,12 +143,16 @@ html {
 .notes-sidebar {
   width: 320px;
   height: 100%;
-  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+  background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
   border-right: 1px solid hsl(var(--border));
   border-top: none;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+}
+
+.dark .notes-sidebar {
+  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
 }
 
 .notes-header-full {
@@ -156,9 +164,13 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: hsl(var(--background));
+  background: #fffffe;
   width: 100%;
   flex-shrink: 0;
+}
+
+.dark .notes-header-full {
+  background: hsl(var(--background));
 }
 
 .sidebar-header {
@@ -167,6 +179,10 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #fffffe;
+}
+
+.dark .sidebar-header {
   background: hsl(var(--background));
 }
 
@@ -254,7 +270,7 @@ html {
   font-size: 0.875rem;
   outline: none;
   transition: all 0.15s;
-  background: hsl(var(--background));
+  background: hsl(var(--input));
   color: hsl(var(--foreground));
 }
 
@@ -416,7 +432,11 @@ html {
   flex: 1;
   height: 100%;
   overflow-y: auto;
-  background: transparent; /* show gradient */
+  background: #fffffe; /* Light mode: match top nav */
+}
+
+.dark .note-detail-viewer {
+  background: hsl(0 0% 5%); /* Dark mode: off-black to match top nav */
 }
 
 .note-detail-viewer::-webkit-scrollbar {
@@ -470,29 +490,57 @@ html {
 
 .note-detail-image {
   width: 100%;
-  max-height: 300px;
-  background: hsl(var(--border));
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
   overflow: hidden;
 }
 
+.note-detail-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--hero-bg-image);
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px);
+  transform: scale(1.1);
+  opacity: 0.6;
+  z-index: 0;
+}
+
 .note-detail-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: relative;
+  max-width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+  z-index: 1;
+  border-radius: 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .note-detail-header {
-  background: hsl(var(--card));
+  background: transparent;
   padding: 2rem;
-  border-bottom: 1px solid hsl(var(--border));
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .note-detail-title {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 400;
   color: hsl(var(--foreground));
   margin: 0 0 1rem 0;
   line-height: 1.2;
+  font-family: 'Crimson Text', serif;
 }
 
 .note-detail-meta {
@@ -506,22 +554,50 @@ html {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .meta-link {
   color: hsl(var(--primary));
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 400;
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
 }
 
 .meta-link:hover {
   text-decoration: underline;
 }
 
+.meta-link-button {
+  color: hsl(var(--primary));
+  text-decoration: none;
+  font-weight: 400;
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.meta-link-button:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.meta-link-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .meta-tags {
   align-items: flex-start;
+}
+
+.meta-tags svg {
+  width: 14px;
+  height: 14px;
 }
 
 .tag-list {
@@ -536,7 +612,7 @@ html {
   border-radius: 0.25rem;
   font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .note-detail-reason {
@@ -557,24 +633,28 @@ html {
 .note-detail-summary {
   margin-top: 1.5rem;
   padding: 1rem 1.25rem;
-  background: hsl(var(--muted));
-  border: 1px solid hsl(var(--border));
+  background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
   border-radius: 0.5rem;
+}
+
+.dark .note-detail-summary {
+  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
 }
 
 .note-detail-summary .summary-title {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 400;
   color: hsl(var(--muted-foreground));
   margin: 0 0 0.75rem 0;
   text-transform: uppercase;
   letter-spacing: 0.025em;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 .note-detail-summary .summary-content {
   font-size: 0.875rem;
   line-height: 1.6;
-  color: hsl(var(--foreground));
+  color: hsl(var(--muted-foreground));
 }
 
 .note-detail-summary .summary-content p {
@@ -584,10 +664,10 @@ html {
 /* Header actions */
 .note-detail-header-actions {
   display: flex;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid hsl(var(--border));
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0;
+  border-top: none;
 }
 
 .note-detail-header-actions .btn {
@@ -595,58 +675,109 @@ html {
 }
 
 /* ========== Tab Navigation ========== */
-.note-tabs {
-  display: flex;
-  gap: 0.25rem;
-  padding: 0 2rem;
-  background: hsl(var(--card));
-  border-bottom: 2px solid hsl(var(--border));
-  overflow-x: auto;
+.note-tabs-container {
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  background: #fffffe; /* Light mode: match page */
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Hide horizontal scrollbar while keeping scroll functionality */
+.dark .note-tabs-container {
+  background: hsl(0 0% 5%); /* Dark mode: match page off-black */
+}
+
+.note-tabs {
+  display: flex;
+  position: relative;
+  gap: 0;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding-left: 2rem;
+}
+
 .note-tabs::-webkit-scrollbar {
   display: none;
 }
 
-.note-tabs button {
-  padding: 0.75rem 1.5rem;
+.note-tab {
+  position: relative;
+  min-width: 72px;
+  padding: 12px 24px;
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: normal;
+  line-height: 1.5;
   color: hsl(var(--muted-foreground));
-  transition: all 0.2s;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  outline: none;
   white-space: nowrap;
-  margin-bottom: -2px;
 }
 
-.note-tabs button:hover {
+.note-tab:hover {
+  background-color: hsl(var(--muted));
   color: hsl(var(--foreground));
-  background: hsl(var(--muted));
 }
 
-.note-tabs button.active {
+.dark .note-tab:hover {
+  background-color: hsl(var(--card));
+}
+
+.note-tab:focus-visible {
+  background-color: hsl(var(--muted) / 0.8);
+  color: hsl(var(--foreground));
+}
+
+.dark .note-tab:focus-visible {
+  background-color: hsl(var(--card) / 0.8);
+}
+
+.note-tab-active {
   color: hsl(var(--primary));
-  border-bottom-color: hsl(var(--primary));
+}
+
+.note-tab-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background-color: hsl(var(--primary));
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.note-tabs-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-right: 2rem;
 }
 
 /* ========== Tab Content ========== */
 .note-tab-content {
-  padding: 3rem 3rem;
-  background: hsl(var(--card));
-  margin: 0 1rem 1rem 1rem;
-  border-radius: 0 0 0.5rem 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 3rem 2rem;
+  background: transparent;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
   min-height: 400px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .note-tab-content .markdown-content {
@@ -654,8 +785,10 @@ html {
   line-height: 1.8;
   word-wrap: break-word;
   color: hsl(var(--foreground));
-  max-width: 700px;
+  max-width: 640px;
   margin: 0 auto;
+  font-family: 'Crimson Text', serif;
+  font-weight: 400;
 }
 
 .markdown-content {
@@ -663,14 +796,16 @@ html {
   line-height: 1.8;
   color: hsl(var(--foreground));
   word-wrap: break-word;
-  max-width: 700px;
+  max-width: 640px;
   margin: 0 auto;
+  font-family: 'Crimson Text', serif;
+  font-weight: 400;
 }
 
 /* Headings */
 .markdown-content h1 {
   font-size: 2.25rem;
-  font-weight: 700;
+  font-weight: 400 !important;
   margin: 2.5rem 0 1.25rem 0;
   color: hsl(var(--foreground));
   border-bottom: 1px solid hsl(var(--border));
@@ -683,7 +818,7 @@ html {
 
 .markdown-content h2 {
   font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 2.25rem 0 1rem 0;
   color: hsl(var(--foreground));
   border-bottom: 1px solid hsl(var(--border));
@@ -692,28 +827,28 @@ html {
 
 .markdown-content h3 {
   font-size: 1.375rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 2rem 0 0.75rem 0;
   color: hsl(var(--foreground));
 }
 
 .markdown-content h4 {
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 1.75rem 0 0.75rem 0;
   color: hsl(var(--foreground));
 }
 
 .markdown-content h5 {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 1.5rem 0 0.5rem 0;
   color: hsl(var(--foreground));
 }
 
 .markdown-content h6 {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 1.5rem 0 0.5rem 0;
   color: hsl(var(--muted-foreground));
 }
@@ -828,7 +963,7 @@ html {
   background: hsl(var(--muted));
   padding: 0.5rem 0.75rem;
   border: 1px solid hsl(var(--border));
-  font-weight: 600;
+  font-weight: 400;
   text-align: left;
   color: hsl(var(--foreground));
 }
@@ -853,7 +988,7 @@ html {
 
 /* Bold and Italic */
 .markdown-content strong {
-  font-weight: 600;
+  font-weight: 400;
   color: hsl(var(--foreground));
 }
 
@@ -929,6 +1064,12 @@ html {
   opacity: 0.9;
 }
 
+.btn-small {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  gap: 0.375rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .notes-sidebar {
@@ -948,6 +1089,22 @@ html {
     max-width: 100%;
   }
 
+  .note-detail-header {
+    padding: 1.5rem;
+  }
+
+  .note-tabs-container {
+    padding: 0;
+  }
+
+  .note-tabs {
+    padding-left: 1.5rem;
+  }
+
+  .note-tabs-right {
+    padding-right: 1.5rem;
+  }
+
   .note-tab-content {
     padding: 2rem 1.5rem;
   }
@@ -962,5 +1119,9 @@ html {
 
   .markdown-content h3 {
     font-size: 1.25rem;
+  }
+
+  .note-detail-image {
+    min-height: 300px;
   }
 }

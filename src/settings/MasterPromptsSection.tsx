@@ -530,7 +530,7 @@ export function MasterPromptsSection() {
           <h3 style={{ fontSize: '1rem', fontWeight: 500, marginBottom: '1rem' }}>
             How Master Prompts Work
           </h3>
-          <ul style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))', paddingLeft: '1.5rem', margin: 0 }}>
+          <ul style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))', padding: 0, margin: 0 }}>
             <li style={{ marginBottom: '0.5rem' }}>
               Master prompts are automatically attached to <strong>every AI request</strong> (chat and plugins)
             </li>

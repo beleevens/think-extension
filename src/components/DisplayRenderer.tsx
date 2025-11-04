@@ -95,8 +95,7 @@ function DisplayRendererInner({ display, data, pluginName, position = 'header', 
   // Render tags format
   if (display.format === 'tags' && isTagsOutput(data) && data.length > 0) {
     return (
-      <div className="meta-item meta-tags" style={{ display: 'flex', marginTop: '1rem' }}>
-        <Tag size={14} />
+      <div className="meta-item meta-tags" style={{ display: 'flex', marginTop: '2rem' }}>
         <div className="tag-list">
           {data.map((tag, i) => (
             <span key={i} className="tag-badge">{tag}</span>
@@ -123,7 +122,6 @@ function DisplayRendererInner({ display, data, pluginName, position = 'header', 
     // Header position: Use summary styling with title and box
     return (
       <div className="note-detail-summary">
-        {pluginName && <h3 className="summary-title">{pluginName}</h3>}
         <div
           className="summary-content"
           dangerouslySetInnerHTML={{

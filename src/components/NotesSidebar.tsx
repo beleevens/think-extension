@@ -1,4 +1,4 @@
-import { Search, Calendar, ExternalLink } from 'lucide-react';
+import { Search, Calendar, Globe } from 'lucide-react';
 import type { LocalNote } from '../lib/types';
 import { formatRelativeDate } from '../lib/date-utils';
 import { truncateText } from '../lib/text-utils';
@@ -97,8 +97,8 @@ export function NotesSidebar({
               </div>
 
               <div className="note-card-domain">
-                <ExternalLink size={14} />
-                {note.domain}
+                <Globe size={14} />
+                {note.domain.replace(/^www\./i, '')}
               </div>
 
               <p className="note-card-preview">

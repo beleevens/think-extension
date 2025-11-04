@@ -4,11 +4,11 @@
 
 @layer base {
   :root {
-    --background: 48 86% 98%;
+    --background: 40 100% 99%; /* #FFFEFC */
     --foreground: 222.2 84% 5%;
-    --card: 0 0% 100%;
+    --card: 60 1% 99.8%; /* #fffffe */
     --card-foreground: 222.2 84% 5%;
-    --popover: 0 0% 100%;
+    --popover: 60 1% 99.8%; /* #fffffe */
     --popover-foreground: 222.2 84% 5%;
     --primary: 192 61% 59%;
     --primary-foreground: 210 40% 98%;
@@ -21,7 +21,7 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --input: 40 100% 99%; /* #FFFEFC */
     --ring: 192 61% 59%;
     --radius: 0.5rem;
   }
@@ -81,6 +81,10 @@ body,
   min-height: 62px;
   max-height: 62px;
   box-sizing: border-box;
+  background: #fffffe;
+}
+
+.dark .header {
   background: hsl(var(--background));
 }
 
@@ -94,7 +98,7 @@ body,
 
 .settings-button {
   @apply flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200;
-  @apply text-muted-foreground hover:text-foreground hover:bg-accent;
+  @apply text-muted-foreground hover:text-foreground;
   @apply cursor-pointer border-none bg-transparent;
 }
 
@@ -136,8 +140,13 @@ body,
 
 /* Messages Container */
 .messages {
-  @apply flex-1 overflow-y-auto p-4 space-y-4;
+  @apply flex-1 p-4 space-y-4;
   background: transparent; /* Allow gradient to show through */
+  overflow-y: auto;
+}
+
+.messages:has(.empty-state) {
+  overflow: hidden;
 }
 
 .messages::-webkit-scrollbar {
@@ -161,12 +170,10 @@ body,
   @apply flex flex-col items-center justify-center h-full text-center px-8;
 }
 
-.empty-state p {
-  @apply text-muted-foreground text-lg mb-2;
-}
-
-.empty-state .hint {
-  @apply text-muted-foreground text-sm;
+.empty-state-icon {
+  width: 100px;
+  height: auto;
+  opacity: 0.6;
 }
 
 /* Message */
@@ -252,9 +259,25 @@ body,
   @apply text-xs text-muted-foreground/70;
 }
 
+/* Note Context Badge - positioned above input area */
+.note-context-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: hsl(var(--accent));
+  border-top: 1px solid hsl(var(--border));
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 /* Input Area */
 .input-area {
   @apply border-t border-border p-4 flex flex-col gap-2;
+  background: #fffffe;
+}
+
+.dark .input-area {
   background: hsl(var(--background));
 }
 
@@ -263,11 +286,16 @@ body,
 }
 
 .input-textarea {
-  @apply flex-1 bg-background border border-input rounded-lg px-3 py-2 text-foreground resize-none outline-none;
+  @apply flex-1 border border-border rounded-lg px-3 py-2 text-foreground resize-none outline-none;
+  background: #fffffe;
   min-height: 40px;
   max-height: 40px;
   font-size: 12pt;
   overflow: hidden;
+}
+
+.dark .input-textarea {
+  background: hsl(var(--background));
 }
 
 .input-textarea:focus {
@@ -379,6 +407,10 @@ body,
   @apply bg-red-500;
 }
 
+.status-dot.unknown {
+  @apply bg-gray-400;
+}
+
 .provider-model-text {
   font-size: 11px;
   color: var(--text-secondary);
@@ -469,6 +501,10 @@ body,
 /* ============ App Container ============ */
 .app-container {
   @apply flex flex-col h-full;
+  background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+}
+
+.dark .app-container {
   background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
 }
 

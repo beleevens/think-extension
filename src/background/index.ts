@@ -54,17 +54,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   try {
     if (info.menuItemId === 'share-selection' && info.selectionText) {
-      await chrome.runtime.sendMessage({
-        type: 'offscreen.send',
-        message: {
-          type: 'chat.message',
-          id: `sel-${Date.now()}`,
-          content: `Selected text:\n\n${info.selectionText}`,
-          timestamp: Date.now(),
-        },
+      // Store selection text for ChatPanel to pick up
+      await chrome.storage.local.set({
+        pendingSelectionText: info.selectionText,
       });
 
-      chrome.sidePanel.open({ tabId: tab.id });
+      // Open side panel
+      await chrome.sidePanel.open({ tabId: tab.id });
     }
 
     if (info.menuItemId === 'share-page') {
@@ -74,26 +70,27 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         return;
       }
 
+      // Capture page data
       const pageData = await captureCurrentPage();
 
-      await chrome.runtime.sendMessage({
-        type: 'offscreen.send',
-        message: {
-          type: 'page.share',
-          id: `page-${Date.now()}`,
-          pageData,
-          action: 'chat',
-          timestamp: Date.now(),
-        },
+      // Store page data for ChatPanel to pick up
+      await chrome.storage.local.set({
+        pendingPageShare: pageData,
       });
 
-      chrome.sidePanel.open({ tabId: tab.id });
+      // Open side panel
+      await chrome.sidePanel.open({ tabId: tab.id });
     }
 
     if (info.menuItemId === 'open-notes') {
-      chrome.tabs.create({
-        url: chrome.runtime.getURL('src/notes/notes.html'),
-      });
+      const notesUrl = chrome.runtime.getURL('src/notes/notes.html');
+      const tabs = await chrome.tabs.query({ url: notesUrl });
+      if (tabs.length > 0 && tabs[0].id) {
+        await chrome.tabs.update(tabs[0].id, { active: true });
+        await chrome.windows.update(tabs[0].windowId!, { focused: true });
+      } else {
+        await chrome.tabs.create({ url: notesUrl });
+      }
     }
   } catch (error) {
     console.error('[Background] Context menu action failed:', error);

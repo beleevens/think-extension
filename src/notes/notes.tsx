@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { getAllNotes, deleteNote } from '../lib/local-notes';
-import { initTheme, listenToThemeChanges } from '../lib/theme';
+import { initTheme, listenToThemeChanges, getTheme, type Theme } from '../lib/theme';
 import type { LocalNote } from '../lib/types';
 import { NotesSidebar } from '../components/NotesSidebar';
 import { NoteDetailViewer } from '../components/NoteDetailViewer';
@@ -29,6 +29,10 @@ function NotesPage() {
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [autoOpenEnabled, setAutoOpenEnabled] = useState(true); // Cache auto-open setting
+  // Theme state for conditional icon rendering - check synchronously to avoid flash
+  const [theme, setTheme] = useState<Theme>(() => {
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  });
 
   // Filter and sort notes using useMemo for better performance
   const filteredNotes = useMemo(() => {
@@ -82,8 +86,13 @@ function NotesPage() {
 
     init();
 
+    // Load initial theme
+    getTheme().then(setTheme);
+
     // Listen for theme changes from other pages
-    const cleanup = listenToThemeChanges();
+    const cleanup = listenToThemeChanges((newTheme) => {
+      setTheme(newTheme);
+    });
     return cleanup;
   }, []);
 
@@ -96,7 +105,14 @@ function NotesPage() {
       // Auto-select first note if available and no note is already selected
       // (preserves deep-link selection from URL hash)
       if (allNotes.length > 0 && !selectedNoteId) {
-        setSelectedNoteId(allNotes[0].id);
+        const firstNoteId = allNotes[0].id;
+        setSelectedNoteId(firstNoteId);
+        // Set first note as context when auto-selecting
+        try {
+          await chrome.storage.local.set({ pendingNoteId: firstNoteId });
+        } catch (error) {
+          console.error('[NotesPage] Failed to set initial note context:', error);
+        }
       }
 
       return allNotes;
@@ -111,6 +127,13 @@ function NotesPage() {
 
   const handleNoteSelect = async (noteId: string) => {
     setSelectedNoteId(noteId);
+
+    // Set note as context in chat panel
+    try {
+      await chrome.storage.local.set({ pendingNoteId: noteId });
+    } catch (error) {
+      console.error('[NotesPage] Failed to set note context:', error);
+    }
 
     // Auto-open conversation if enabled
     try {
@@ -214,7 +237,11 @@ function NotesPage() {
       {/* Full-width header */}
       <div className="notes-header-full">
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <img src={chrome.runtime.getURL('branding/Think_OS_Full_Word_Mark.svg')} alt="Think OS" style={{ height: '20px' }} />
+          <img 
+            src={chrome.runtime.getURL(theme === 'light' ? 'branding/Think_OS_Full_Word_Mark-lightmode.svg' : 'branding/Think_OS_Full_Word_Mark.svg')} 
+            alt="Think OS" 
+            style={{ height: '20px' }} 
+          />
           <h2 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 'normal', lineHeight: '1.5' }}>My Notes</h2>
         </div>
       </div>
