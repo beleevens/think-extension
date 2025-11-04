@@ -12,13 +12,13 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
       id: 'share-selection',
-      title: 'Share with Think Better',
+      title: 'Share with Think',
       contexts: ['selection'],
     });
 
     chrome.contextMenus.create({
       id: 'share-page',
-      title: 'Share Page with Think Better',
+      title: 'Share Page with Think',
       contexts: ['page'],
     });
 

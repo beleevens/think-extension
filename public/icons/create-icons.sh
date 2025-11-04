@@ -1,10 +1,10 @@
 #!/bin/bash
-# Generate extension icons from Think Better main application logo
+# Generate extension icons from Think main application logo
 # Uses macOS sips command (built-in, no dependencies needed)
 
 set -e  # Exit on error
 
-echo "🎨 Generating Think Better extension icons..."
+echo "🎨 Generating Think extension icons..."
 echo "================================================"
 
 # Source icon - use the main app icon (512x512 PNG)
@@ -13,7 +13,7 @@ SOURCE_ICON="../../../public/icons/think-os-agent.png"
 # Check if source exists
 if [ ! -f "$SOURCE_ICON" ]; then
   echo "❌ Error: Source icon not found at $SOURCE_ICON"
-  echo "   Expected: Think Better main app icon (512x512 PNG)"
+  echo "   Expected: Think main app icon (512x512 PNG)"
   exit 1
 fi
 
