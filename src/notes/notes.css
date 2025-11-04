@@ -23,7 +23,7 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
-    --input: 40 100% 99%; /* #FFFEFC */
+    --input: 60 1% 99.8%; /* #fffffe */
     --ring: 192 61% 59%;
     --radius: 0.5rem;
   }
@@ -61,9 +61,13 @@ body {
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+  background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
   color: hsl(var(--foreground));
   overflow: hidden; /* Hide browser scrollbar */
+}
+
+.dark body {
+  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
 }
 
 body::-webkit-scrollbar {
@@ -148,7 +152,7 @@ html {
 }
 
 .dark .notes-sidebar {
-  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+  background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
 }
 
 .notes-header-full {
@@ -266,7 +270,7 @@ html {
   font-size: 0.875rem;
   outline: none;
   transition: all 0.15s;
-  background: hsl(var(--background));
+  background: hsl(var(--input));
   color: hsl(var(--foreground));
 }
 

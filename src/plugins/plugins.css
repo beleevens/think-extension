@@ -170,7 +170,7 @@
   font-size: 0.875rem;
   border: 2px solid hsl(var(--border));
   border-radius: var(--radius);
-  background: hsl(var(--background));
+  background: hsl(var(--input));
   color: hsl(var(--foreground));
   transition: border-color 0.2s ease;
 }

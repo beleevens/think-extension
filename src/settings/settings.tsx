@@ -12,7 +12,7 @@ import {
 } from '../lib/ai-client';
 import { getNoteCount, getStorageUsage, exportNotes, importNotes, clearAllNotes, exportNotesAsMarkdown, getStorageBreakdown, type StorageBreakdown } from '../lib/local-notes';
 import { OllamaSetupModal } from '../components/OllamaSetupModal';
-import { initTheme, listenToThemeChanges } from '../lib/theme';
+import { initTheme, listenToThemeChanges, getTheme, type Theme } from '../lib/theme';
 import { registerBuiltInPlugins, listenToPluginChanges } from '../plugins/registry';
 import { PluginsSection } from './PluginsSection';
 import { VariablesSection } from './VariablesSection';
@@ -97,6 +97,11 @@ function SettingsPage() {
   };
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
+  // Theme state for conditional icon rendering - check synchronously to avoid flash
+  const [theme, setTheme] = useState<Theme>(() => {
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  });
+
   useEffect(() => {
     initTheme(); // Initialize dark mode on mount
     loadSettings();
@@ -114,7 +119,9 @@ function SettingsPage() {
       });
 
     // Listen for theme changes from other pages
-    const themeCleanup = listenToThemeChanges();
+    const themeCleanup = listenToThemeChanges((newTheme) => {
+      setTheme(newTheme);
+    });
 
     // Listen for plugin changes (hot-reload)
     const pluginCleanup = listenToPluginChanges(() => {
@@ -550,7 +557,11 @@ function SettingsPage() {
         <header className="settings-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <img src={chrome.runtime.getURL('branding/Think_OS_Full_Word_Mark.svg')} alt="Think OS" style={{ height: '20px' }} />
+            <img 
+              src={chrome.runtime.getURL(theme === 'light' ? 'branding/Think_OS_Full_Word_Mark-lightmode.svg' : 'branding/Think_OS_Full_Word_Mark.svg')} 
+              alt="Think OS" 
+              style={{ height: '20px' }} 
+            />
             <h2 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 'normal', lineHeight: '1.5' }}>Settings</h2>
           </div>
         </div>

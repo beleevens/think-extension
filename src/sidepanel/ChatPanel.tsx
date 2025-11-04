@@ -4,7 +4,7 @@ import { Settings, Library, Eraser, PlusCircle, Loader2, Check, FileText, Extern
 import { captureCurrentPage, saveCurrentPageAsNote, canCapturePage } from '../lib/page-capture';
 import { SaveNoteDialog } from '../components/SaveNoteDialog';
 import { ThemeToggle } from '../components/ThemeToggle';
-import { initTheme, listenToThemeChanges } from '../lib/theme';
+import { initTheme, listenToThemeChanges, getTheme, type Theme } from '../lib/theme';
 import type { VeniceMessage } from '../lib/venice-client';
 import type { ClaudeMessage } from '../lib/claude-client';
 import {
@@ -130,12 +130,22 @@ export function ChatPanel() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const loadingConversationRef = useRef(false);
 
+  // Theme state for conditional icon rendering - check synchronously to avoid flash
+  const [theme, setTheme] = useState<Theme>(() => {
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  });
+
   useEffect(() => {
     initTheme(); // Initialize dark mode on mount
     loadProviderSettings();
 
+    // Load initial theme (in case it differs from class)
+    getTheme().then(setTheme);
+
     // Listen for theme changes from other pages
-    const cleanup = listenToThemeChanges();
+    const cleanup = listenToThemeChanges((newTheme) => {
+      setTheme(newTheme);
+    });
     return cleanup;
   }, []);
 
@@ -794,7 +804,11 @@ export function ChatPanel() {
         <div className="header">
           <div className="header-row">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative' }}>
-              <img src={chrome.runtime.getURL('icons/think-os-agent.png')} alt="Think OS Agent" style={{ height: '24px' }} />
+              <img 
+                src={chrome.runtime.getURL(theme === 'light' ? 'icons/think-os-agent-lightmode.svg' : 'icons/think-os-agent.png')} 
+                alt="Think OS Agent" 
+                style={{ height: '24px' }} 
+              />
               {/* status dot to the right of the icon */}
               <span
                 title={statusTitle}
@@ -854,8 +868,11 @@ export function ChatPanel() {
 
         {isConnected && messages.length === 0 && (
           <div className="empty-state">
-            <p className="ready-to-chat">Ready to chat</p>
-            <p className="hint">Ask me anything or share the current page</p>
+            <img 
+              src={chrome.runtime.getURL('icons/think-os-agent-grey-blue.svg')} 
+              alt="Think OS Agent" 
+              className="empty-state-icon"
+            />
           </div>
         )}
 
