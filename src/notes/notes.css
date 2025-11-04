@@ -432,7 +432,11 @@ html {
   flex: 1;
   height: 100%;
   overflow-y: auto;
-  background: transparent; /* show gradient */
+  background: #fffffe; /* Light mode: match top nav */
+}
+
+.dark .note-detail-viewer {
+  background: hsl(0 0% 5%); /* Dark mode: off-black to match top nav */
 }
 
 .note-detail-viewer::-webkit-scrollbar {
@@ -486,29 +490,58 @@ html {
 
 .note-detail-image {
   width: 100%;
-  max-height: 300px;
-  background: hsl(var(--border));
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
   overflow: hidden;
 }
 
+.note-detail-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--hero-bg-image);
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px);
+  transform: scale(1.1);
+  opacity: 0.6;
+  z-index: 0;
+}
+
 .note-detail-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: relative;
+  max-width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+  z-index: 1;
+  border-radius: 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .note-detail-header {
-  background: hsl(var(--card));
+  background: transparent;
   padding: 2rem;
   border-bottom: 1px solid hsl(var(--border));
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .note-detail-title {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 400;
   color: hsl(var(--foreground));
   margin: 0 0 1rem 0;
   line-height: 1.2;
+  font-family: 'Crimson Text', serif;
 }
 
 .note-detail-meta {
@@ -522,14 +555,19 @@ html {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .meta-link {
   color: hsl(var(--primary));
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 400;
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
 }
 
 .meta-link:hover {
@@ -552,7 +590,7 @@ html {
   border-radius: 0.25rem;
   font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .note-detail-reason {
@@ -574,17 +612,17 @@ html {
   margin-top: 1.5rem;
   padding: 1rem 1.25rem;
   background: hsl(var(--muted));
-  border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
 }
 
 .note-detail-summary .summary-title {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 400;
   color: hsl(var(--muted-foreground));
   margin: 0 0 0.75rem 0;
   text-transform: uppercase;
   letter-spacing: 0.025em;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 .note-detail-summary .summary-content {
@@ -615,15 +653,22 @@ html {
   display: flex;
   gap: 0.25rem;
   padding: 0 2rem;
-  background: hsl(var(--card));
+  background: #fffffe; /* Light mode: match page */
   border-bottom: 2px solid hsl(var(--border));
   overflow-x: auto;
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dark .note-tabs {
+  background: hsl(0 0% 5%); /* Dark mode: match page off-black */
 }
 
 /* Hide horizontal scrollbar while keeping scroll functionality */
@@ -657,12 +702,16 @@ html {
 
 /* ========== Tab Content ========== */
 .note-tab-content {
-  padding: 3rem 3rem;
-  background: hsl(var(--card));
-  margin: 0 1rem 1rem 1rem;
-  border-radius: 0 0 0.5rem 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 3rem 2rem;
+  background: transparent;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
   min-height: 400px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .note-tab-content .markdown-content {
@@ -670,8 +719,10 @@ html {
   line-height: 1.8;
   word-wrap: break-word;
   color: hsl(var(--foreground));
-  max-width: 700px;
+  max-width: 640px;
   margin: 0 auto;
+  font-family: 'Crimson Text', serif;
+  font-weight: 400;
 }
 
 .markdown-content {
@@ -679,14 +730,16 @@ html {
   line-height: 1.8;
   color: hsl(var(--foreground));
   word-wrap: break-word;
-  max-width: 700px;
+  max-width: 640px;
   margin: 0 auto;
+  font-family: 'Crimson Text', serif;
+  font-weight: 400;
 }
 
 /* Headings */
 .markdown-content h1 {
   font-size: 2.25rem;
-  font-weight: 700;
+  font-weight: 400 !important;
   margin: 2.5rem 0 1.25rem 0;
   color: hsl(var(--foreground));
   border-bottom: 1px solid hsl(var(--border));
@@ -699,7 +752,7 @@ html {
 
 .markdown-content h2 {
   font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 2.25rem 0 1rem 0;
   color: hsl(var(--foreground));
   border-bottom: 1px solid hsl(var(--border));
@@ -708,28 +761,28 @@ html {
 
 .markdown-content h3 {
   font-size: 1.375rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 2rem 0 0.75rem 0;
   color: hsl(var(--foreground));
 }
 
 .markdown-content h4 {
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 1.75rem 0 0.75rem 0;
   color: hsl(var(--foreground));
 }
 
 .markdown-content h5 {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 1.5rem 0 0.5rem 0;
   color: hsl(var(--foreground));
 }
 
 .markdown-content h6 {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 400;
   margin: 1.5rem 0 0.5rem 0;
   color: hsl(var(--muted-foreground));
 }
@@ -844,7 +897,7 @@ html {
   background: hsl(var(--muted));
   padding: 0.5rem 0.75rem;
   border: 1px solid hsl(var(--border));
-  font-weight: 600;
+  font-weight: 400;
   text-align: left;
   color: hsl(var(--foreground));
 }
@@ -869,7 +922,7 @@ html {
 
 /* Bold and Italic */
 .markdown-content strong {
-  font-weight: 600;
+  font-weight: 400;
   color: hsl(var(--foreground));
 }
 
@@ -964,6 +1017,14 @@ html {
     max-width: 100%;
   }
 
+  .note-detail-header {
+    padding: 1.5rem;
+  }
+
+  .note-tabs {
+    padding: 0 1.5rem;
+  }
+
   .note-tab-content {
     padding: 2rem 1.5rem;
   }
@@ -978,5 +1039,9 @@ html {
 
   .markdown-content h3 {
     font-size: 1.25rem;
+  }
+
+  .note-detail-image {
+    min-height: 300px;
   }
 }

@@ -168,7 +168,12 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
     <div className="note-detail-viewer">
       {/* OG Image */}
       {note.ogImage && (
-        <div className="note-detail-image">
+        <div 
+          className="note-detail-image"
+          style={{
+            '--hero-bg-image': `url(${note.ogImage})`
+          } as React.CSSProperties}
+        >
           <img
             src={note.ogImage}
             alt={note.title}
