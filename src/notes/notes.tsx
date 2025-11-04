@@ -86,6 +86,15 @@ function NotesPage() {
 
     init();
 
+    // Listen for storage changes to refresh notes list
+    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      if (changes['notes'] || changes['notesIndex']) {
+        // Reload notes when storage changes (e.g., when a new note is saved)
+        loadNotes();
+      }
+    };
+    chrome.storage.onChanged.addListener(handleStorageChange);
+
     // Load initial theme
     getTheme().then(setTheme);
 
@@ -93,7 +102,11 @@ function NotesPage() {
     const cleanup = listenToThemeChanges((newTheme) => {
       setTheme(newTheme);
     });
-    return cleanup;
+
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+      cleanup();
+    };
   }, []);
 
   const loadNotes = async () => {

@@ -228,7 +228,7 @@ html {
   color: hsl(var(--primary));
 }
 
-.icon-btn .spin {
+.spin {
   animation: spin 1s linear infinite;
 }
 

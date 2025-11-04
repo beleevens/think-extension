@@ -13,14 +13,17 @@
   },
   "blocks": [
     {
+      "id": "a1b2c3d4-e5f6-4789-a012-bcdef1234567",
       "name": "Beginner Guide",
       "prompt": "Explain this article for someone who is completely new to the topic. Use simple language, define all technical terms, and provide analogies.\n\n{{content}}"
     },
     {
+      "id": "b2c3d4e5-f6a7-4890-b123-cdef12345678",
       "name": "Deep Dive",
       "prompt": "Provide an advanced, technical analysis of this article. Identify underlying principles, potential implications, and connections to related concepts.\n\n{{content}}"
     },
     {
+      "id": "c3d4e5f6-a7b8-4901-c234-def123456789",
       "name": "Critical Analysis",
       "prompt": "Critically analyze this article. What assumptions does it make? What questions does it leave unanswered? What alternative viewpoints should be considered?\n\n{{content}}"
     }

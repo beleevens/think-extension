@@ -159,7 +159,9 @@ Array of string tags. Prompt must return JSON format: `{"tags": ["tag1", "tag2",
 
 Multiple separate AI responses, each in its own section/tab.
 
-**Required field:** `"blocks"` array with objects containing `name` and `prompt`
+**Required field:** `"blocks"` array with objects containing `id`, `name`, and `prompt`
+
+> **⚠️ Important:** Each block MUST have a unique `id` field. Without it, the plugin will fail to load with an error.
 
 **Example:**
 ```json
@@ -175,10 +177,12 @@ Multiple separate AI responses, each in its own section/tab.
   },
   "blocks": [
     {
+      "id": "strengths",
       "name": "Strengths",
       "prompt": "What are the strengths of this argument?\n\n{{content}}"
     },
     {
+      "id": "weaknesses",
       "name": "Weaknesses",
       "prompt": "What are the weaknesses?\n\n{{content}}"
     }
@@ -310,7 +314,11 @@ If you have old plugins that use the previous schema format, you need to update 
 
 ### Blocks Don't Show Up
 - **Cause:** Missing `blocks` array or wrong display format
-- **Fix:** Add `blocks` array with `name` and `prompt` for each block, set `"format": "blocks"`
+- **Fix:** Add `blocks` array with `id`, `name`, and `prompt` for each block, set `"format": "blocks"`
+
+### Error: "Block is missing required ID"
+- **Cause:** Blocks in a plugin are missing the required `id` field
+- **Fix:** Add a unique `id` field to each block in your `blocks` array. Example: `{"id": "block-1", "name": "Block Name", "prompt": "..."}`
 
 ---
 

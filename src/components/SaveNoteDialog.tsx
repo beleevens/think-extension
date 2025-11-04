@@ -69,17 +69,6 @@ export function SaveNoteDialog({
     }
   };
 
-  // Ripple effect component
-  const RippleEffect = () => (
-    <motion.div
-      initial={{ scale: 0, opacity: 0.8 }}
-      animate={{ scale: 3, opacity: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500/20 to-purple-500/20"
-      style={{ transformOrigin: 'center' }}
-    />
-  );
-
   // Unified clipboard transition with seamless content morphing
   const ClipboardTransition = ({ isSuccess }: { isSuccess: boolean }) => (
     <motion.div className="relative">
@@ -115,7 +104,7 @@ export function SaveNoteDialog({
                   animate={{ pathLength: 1, opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{
-                    pathLength: { duration: 0.3, delay: 0.2 },
+                    pathLength: { duration: 0.3, delay: 0.2, repeat: Infinity, repeatDelay: 0.8 },
                     opacity: { duration: 0.3 },
                     exit: { duration: 0.15 },
                   }}
@@ -126,7 +115,7 @@ export function SaveNoteDialog({
                   animate={{ pathLength: 1, opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{
-                    pathLength: { duration: 0.3, delay: 0.4 },
+                    pathLength: { duration: 0.3, delay: 0.4, repeat: Infinity, repeatDelay: 0.8 },
                     opacity: { duration: 0.3 },
                     exit: { duration: 0.15, delay: 0.1 },
                   }}
@@ -137,7 +126,7 @@ export function SaveNoteDialog({
                   animate={{ pathLength: 1, opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{
-                    pathLength: { duration: 0.3, delay: 0.6 },
+                    pathLength: { duration: 0.3, delay: 0.6, repeat: Infinity, repeatDelay: 0.8 },
                     opacity: { duration: 0.3 },
                     exit: { duration: 0.15, delay: 0.2 },
                   }}
@@ -148,7 +137,7 @@ export function SaveNoteDialog({
                   animate={{ pathLength: 1, opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{
-                    pathLength: { duration: 0.3, delay: 0.8 },
+                    pathLength: { duration: 0.3, delay: 0.8, repeat: Infinity, repeatDelay: 0.8 },
                     opacity: { duration: 0.3 },
                     exit: { duration: 0.15, delay: 0.3 },
                   }}
@@ -185,7 +174,7 @@ export function SaveNoteDialog({
                 initial={{ scale: 0, opacity: 0.6 }}
                 animate={{ scale: 2 + i, opacity: 0 }}
                 transition={{ delay: 0.8 + i * 0.15, duration: 0.8 }}
-                className="absolute inset-0 border-2 border-emerald-400 rounded-full"
+                className="absolute inset-0 border-2 border-emerald-400 rounded-full pointer-events-none"
                 style={{ transformOrigin: 'center' }}
               />
             ))}
@@ -222,11 +211,6 @@ export function SaveNoteDialog({
             style={{ backgroundColor: 'hsl(var(--card))' }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Ripple effect overlay */}
-            <AnimatePresence>
-              {dialogState === 'saving' && <RippleEffect />}
-            </AnimatePresence>
-
             {/* Form Content */}
             <AnimatePresence mode="wait">
               {dialogState === 'form' && (
