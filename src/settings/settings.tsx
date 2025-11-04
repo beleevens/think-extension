@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Loader2, Check } from 'lucide-react';
+import { Loader2, Check, Eye, EyeOff } from 'lucide-react';
 import {
   createAIClient,
   type AIProvider,
@@ -97,13 +97,18 @@ function SettingsPage() {
   };
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
-  // Theme state for conditional icon rendering - check synchronously to avoid flash
-  const [theme, setTheme] = useState<Theme>(() => {
-    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-  });
+  // Theme state for conditional icon rendering - initialize from storage
+  const [theme, setTheme] = useState<Theme>('dark'); // Default to dark, will be updated immediately
 
   useEffect(() => {
-    initTheme(); // Initialize dark mode on mount
+    // Initialize theme and update state
+    const initializeTheme = async () => {
+      await initTheme(); // Initialize dark mode on mount
+      const currentTheme = await getTheme(); // Get the actual theme from storage
+      setTheme(currentTheme);
+    };
+    
+    initializeTheme();
     loadSettings();
     loadNotesStatistics();
 
@@ -516,10 +521,15 @@ function SettingsPage() {
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
   };
 
-  const openNotesPage = () => {
-    chrome.tabs.create({
-      url: chrome.runtime.getURL('src/notes/notes.html'),
-    });
+  const openNotesPage = async () => {
+    const notesUrl = chrome.runtime.getURL('src/notes/notes.html');
+    const tabs = await chrome.tabs.query({ url: notesUrl });
+    if (tabs.length > 0 && tabs[0].id) {
+      await chrome.tabs.update(tabs[0].id, { active: true });
+      await chrome.windows.update(tabs[0].windowId!, { focused: true });
+    } else {
+      await chrome.tabs.create({ url: notesUrl });
+    }
   };
 
   const getStatusBadge = (status: ConnectionStatus) => {
@@ -560,7 +570,7 @@ function SettingsPage() {
             <img 
               src={chrome.runtime.getURL(theme === 'light' ? 'branding/Think_OS_Full_Word_Mark-lightmode.svg' : 'branding/Think_OS_Full_Word_Mark.svg')} 
               alt="Think OS" 
-              style={{ height: '20px' }} 
+              style={{ height: '20px', width: 'auto', display: 'block' }} 
             />
             <h2 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 'normal', lineHeight: '1.5' }}>Settings</h2>
           </div>
@@ -758,7 +768,7 @@ function SettingsPage() {
                     className="toggle-visibility-btn"
                     title={showApiKey ? 'Hide API key' : 'Show API key'}
                   >
-                    {showApiKey ? '👁️' : '👁️‍🗨️'}
+                    {showApiKey ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
                 </div>
               </div>

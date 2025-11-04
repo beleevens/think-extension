@@ -105,7 +105,14 @@ function NotesPage() {
       // Auto-select first note if available and no note is already selected
       // (preserves deep-link selection from URL hash)
       if (allNotes.length > 0 && !selectedNoteId) {
-        setSelectedNoteId(allNotes[0].id);
+        const firstNoteId = allNotes[0].id;
+        setSelectedNoteId(firstNoteId);
+        // Set first note as context when auto-selecting
+        try {
+          await chrome.storage.local.set({ pendingNoteId: firstNoteId });
+        } catch (error) {
+          console.error('[NotesPage] Failed to set initial note context:', error);
+        }
       }
 
       return allNotes;
@@ -120,6 +127,13 @@ function NotesPage() {
 
   const handleNoteSelect = async (noteId: string) => {
     setSelectedNoteId(noteId);
+
+    // Set note as context in chat panel
+    try {
+      await chrome.storage.local.set({ pendingNoteId: noteId });
+    } catch (error) {
+      console.error('[NotesPage] Failed to set note context:', error);
+    }
 
     // Auto-open conversation if enabled
     try {

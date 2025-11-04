@@ -55,11 +55,16 @@ export function SaveNoteDialog({
     onClose();
   };
 
-  const handleViewNote = () => {
+  const handleViewNote = async () => {
     if (savedNoteId) {
-      chrome.tabs.create({
-        url: chrome.runtime.getURL(`src/notes/notes.html#note=${savedNoteId}`),
-      });
+      const notesUrl = chrome.runtime.getURL(`src/notes/notes.html#note=${savedNoteId}`);
+      const tabs = await chrome.tabs.query({ url: chrome.runtime.getURL('src/notes/notes.html') });
+      if (tabs.length > 0 && tabs[0].id) {
+        await chrome.tabs.update(tabs[0].id, { url: notesUrl, active: true });
+        await chrome.windows.update(tabs[0].windowId!, { focused: true });
+      } else {
+        await chrome.tabs.create({ url: notesUrl });
+      }
       onClose();
     }
   };

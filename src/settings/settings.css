@@ -103,6 +103,12 @@ html {
   background: hsl(var(--background));
 }
 
+.settings-header img {
+  forced-color-adjust: none;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
 .settings-header h1 {
   font-size: 2rem;
   font-weight: 700;
@@ -295,11 +301,13 @@ html {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.25rem;
   padding: 0.25rem;
   opacity: 0.6;
   transition: opacity 0.2s;
   color: hsl(var(--muted-foreground));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .toggle-visibility-btn:hover {

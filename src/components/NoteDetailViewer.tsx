@@ -32,6 +32,7 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
   const [isCleaningUp, setIsCleaningUp] = useState(false);
   const [cleanupError, setCleanupError] = useState<string | null>(null);
   const [hasApiKey, setHasApiKey] = useState(false);
+  const [heroImageError, setHeroImageError] = useState(false);
   const [indicatorStyle, setIndicatorStyle] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const originalTabRef = useRef<HTMLButtonElement>(null);
@@ -95,6 +96,7 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
     setActiveTab('original');
     setCleanupError(null);
     setIsCleaningUp(false);
+    setHeroImageError(false); // Reset hero image error when note changes
   }, [note?.id]);
 
   // Update indicator position when active tab changes
@@ -194,21 +196,23 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
     );
   }
 
+  const heroImage = note.ogImage;
+
   return (
     <div className="note-detail-viewer">
-      {/* OG Image */}
-      {note.ogImage && (
+      {/* Hero Image - only show if ogImage exists and hasn't errored */}
+      {heroImage && !heroImageError && (
         <div 
           className="note-detail-image"
           style={{
-            '--hero-bg-image': `url(${note.ogImage})`
+            '--hero-bg-image': `url(${heroImage})`
           } as React.CSSProperties}
         >
           <img
-            src={note.ogImage}
+            src={heroImage}
             alt={note.title}
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
+            onError={() => {
+              setHeroImageError(true);
             }}
           />
         </div>

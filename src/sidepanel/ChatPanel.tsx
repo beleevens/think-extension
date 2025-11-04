@@ -821,7 +821,16 @@ export function ChatPanel() {
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button
                 className="settings-button"
-                onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL('src/notes/notes.html') })}
+                onClick={async () => {
+                  const notesUrl = chrome.runtime.getURL('src/notes/notes.html');
+                  const tabs = await chrome.tabs.query({ url: notesUrl });
+                  if (tabs.length > 0 && tabs[0].id) {
+                    await chrome.tabs.update(tabs[0].id, { active: true });
+                    await chrome.windows.update(tabs[0].windowId!, { focused: true });
+                  } else {
+                    await chrome.tabs.create({ url: notesUrl });
+                  }
+                }}
                 title="My Notes"
                 aria-label="Open notes"
               >
@@ -830,7 +839,16 @@ export function ChatPanel() {
               <ThemeToggle />
               <button
                 className="settings-button"
-                onClick={() => chrome.runtime.openOptionsPage()}
+                onClick={async () => {
+                  const settingsUrl = chrome.runtime.getURL('src/settings/settings.html');
+                  const tabs = await chrome.tabs.query({ url: settingsUrl });
+                  if (tabs.length > 0 && tabs[0].id) {
+                    await chrome.tabs.update(tabs[0].id, { active: true });
+                    await chrome.windows.update(tabs[0].windowId!, { focused: true });
+                  } else {
+                    await chrome.runtime.openOptionsPage();
+                  }
+                }}
                 title="Settings"
                 aria-label="Open settings"
               >

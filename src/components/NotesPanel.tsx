@@ -100,10 +100,15 @@ export function NotesPanel() {
     setExpandedNoteId((prev) => (prev === noteId ? null : noteId));
   };
 
-  const openFullPage = () => {
-    chrome.tabs.create({
-      url: chrome.runtime.getURL('src/notes/notes.html'),
-    });
+  const openFullPage = async () => {
+    const notesUrl = chrome.runtime.getURL('src/notes/notes.html');
+    const tabs = await chrome.tabs.query({ url: notesUrl });
+    if (tabs.length > 0 && tabs[0].id) {
+      await chrome.tabs.update(tabs[0].id, { active: true });
+      await chrome.windows.update(tabs[0].windowId!, { focused: true });
+    } else {
+      await chrome.tabs.create({ url: notesUrl });
+    }
   };
 
   return (
