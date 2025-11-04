@@ -121,7 +121,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
     chrome.contextMenus.create({
       id: 'open-notes',
-      title: 'Open My Notes',
+      title: 'Open My Memories',
       contexts: ['page', 'action'],
     });
   });

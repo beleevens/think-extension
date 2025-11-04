@@ -239,7 +239,7 @@ export function ChatPanel() {
             {
               id: `sys-${Date.now()}`,
               role: 'system',
-              content: `Note added to context: ${context.title}`,
+              content: `Memory added to context: ${context.title}`,
               timestamp: Date.now(),
             },
           ]);
@@ -298,7 +298,7 @@ export function ChatPanel() {
           {
             id: `sys-${Date.now()}`,
             role: 'system',
-            content: `Note added to context: ${context.title}`,
+            content: `Memory added to context: ${context.title}`,
             timestamp: Date.now(),
           },
         ]);
@@ -741,7 +741,7 @@ export function ChatPanel() {
             {
               id: `sys-${Date.now()}`,
               role: 'system',
-              content: `Note saved: "${noteTitle}"`,
+              content: `Memory saved: "${noteTitle}"`,
               timestamp: Date.now(),
               noteId: result.noteId,
               noteTitle: noteTitle,
@@ -756,7 +756,7 @@ export function ChatPanel() {
           {
             id: `error-${Date.now()}`,
             role: 'system',
-            content: `Failed to save note: ${result.error || 'Unknown error'}`,
+            content: `Failed to save memory: ${result.error || 'Unknown error'}`,
             timestamp: Date.now(),
           },
         ]);
@@ -844,8 +844,8 @@ export function ChatPanel() {
                     await chrome.tabs.create({ url: notesUrl });
                   }
                 }}
-                title="My Notes"
-                aria-label="Open notes"
+                title="My Memories"
+                aria-label="Open memories"
               >
                 <Library size={18} />
               </button>
@@ -917,7 +917,7 @@ export function ChatPanel() {
                     <div className="note-card-message-content">
                       <div className="note-card-message-header">
                         <Check size={16} className="note-card-message-icon" />
-                        <span className="note-card-message-label">Note Saved</span>
+                        <span className="note-card-message-label">Memory Saved</span>
                       </div>
                       <div className="note-card-message-title">"{msg.noteTitle}"</div>
                     </div>
@@ -1000,8 +1000,8 @@ export function ChatPanel() {
             }}
             onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
             onMouseOut={(e) => (e.currentTarget.style.opacity = '0.7')}
-            title="Close note conversation"
-            aria-label="Close note conversation"
+            title="Close memory conversation"
+            aria-label="Close memory conversation"
           >
             ✕
           </button>
@@ -1040,10 +1040,10 @@ export function ChatPanel() {
             onClick={savePageAsNote}
             disabled={savingNote}
             className="btn btn-accent btn-sm gap-1.5"
-            title="Save current page as note (stored locally in extension)"
+            title="Save current page as memory (stored locally in extension)"
           >
             {savingNote ? <Loader2 size={18} className="spin" /> : <PlusCircle size={18} />}
-            {savingNote ? 'Saving...' : 'Save as Note'}
+            {savingNote ? 'Saving...' : 'Save as Memory'}
           </button>
         </div>
 

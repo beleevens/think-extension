@@ -190,8 +190,8 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
     return (
       <div className="note-detail-empty">
         <div className="empty-icon">📝</div>
-        <h2>No note selected</h2>
-        <p>Select a note from the sidebar to view its content</p>
+        <h2>No memory selected</h2>
+        <p>Select a memory from the sidebar to view its content</p>
       </div>
     );
   }
@@ -249,7 +249,7 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
               className="meta-link meta-link-button"
               style={{ background: 'none', border: 'none', padding: 0, cursor: deleting ? 'not-allowed' : 'pointer' }}
             >
-              {deleting ? 'Deleting...' : 'Delete Note'}
+              {deleting ? 'Deleting...' : 'Delete Memory'}
             </button>
           </div>
         </div>

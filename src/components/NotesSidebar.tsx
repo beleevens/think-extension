@@ -34,7 +34,7 @@ export function NotesSidebar({
           <Search size={18} className="search-icon" />
           <input
             type="text"
-            placeholder="Search notes..."
+            placeholder="Search memories..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="search-input"
@@ -65,7 +65,7 @@ export function NotesSidebar({
 
       {/* Notes Count */}
       <div className="sidebar-count">
-        {notes.length} {notes.length === 1 ? 'note' : 'notes'}
+        {notes.length} {notes.length === 1 ? 'memory' : 'memories'}
         {searchQuery && ` matching "${searchQuery}"`}
       </div>
 
@@ -73,13 +73,13 @@ export function NotesSidebar({
       <div className="sidebar-notes-list">
         {notes.length === 0 && searchQuery ? (
           <div className="sidebar-empty">
-            <p>No notes found</p>
+            <p>No memories found</p>
             <p className="hint">Try a different search term</p>
           </div>
         ) : notes.length === 0 ? (
           <div className="sidebar-empty">
-            <p>No notes yet</p>
-            <p className="hint">Save your first note while browsing</p>
+            <p>No memories yet</p>
+            <p className="hint">Save your first memory while browsing</p>
           </div>
         ) : (
           notes.map((note) => (

@@ -70,7 +70,7 @@ export function NotesPanel() {
 
   const handleDelete = async (noteId: string, noteTitle: string) => {
     const confirmed = confirm(
-      `Delete note "${noteTitle}"?\n\nThis cannot be undone.`
+      `Delete memory "${noteTitle}"?\n\nThis cannot be undone.`
     );
 
     if (!confirmed) return;
@@ -90,7 +90,7 @@ export function NotesPanel() {
       }
     } catch (error) {
       console.error('[NotesPanel] Failed to delete note:', error);
-      alert('Failed to delete note. Please try again.');
+      alert('Failed to delete memory. Please try again.');
     } finally {
       setDeletingNoteId(null);
     }
@@ -117,16 +117,16 @@ export function NotesPanel() {
       <div className="notes-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1>Saved Notes</h1>
+            <h1>Saved Memories</h1>
             <p className="notes-count">
-              {filteredNotes.length} {filteredNotes.length === 1 ? 'note' : 'notes'}
+              {filteredNotes.length} {filteredNotes.length === 1 ? 'memory' : 'memories'}
               {searchQuery && ` matching "${searchQuery}"`}
             </p>
           </div>
           <button
             onClick={openFullPage}
             className="btn btn-accent btn-sm flex items-center gap-2"
-            title="Open notes in full page"
+            title="Open memories in full page"
           >
             <Expand size={18} />
             Full View
@@ -139,7 +139,7 @@ export function NotesPanel() {
         <Search size={18} className="search-icon" />
         <input
           type="text"
-          placeholder="Search notes by title, content, domain..."
+          placeholder="Search memories by title, content, domain..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
@@ -189,11 +189,11 @@ export function NotesPanel() {
       <div className="notes-list">
         {loading ? (
           <div className="notes-empty">
-            <p>Loading notes...</p>
+            <p>Loading memories...</p>
           </div>
         ) : filteredNotes.length === 0 && searchQuery ? (
           <div className="notes-empty">
-            <p>No notes found</p>
+            <p>No memories found</p>
             <p className="notes-empty-hint">
               Try a different search term or{' '}
               <button
@@ -206,9 +206,9 @@ export function NotesPanel() {
           </div>
         ) : filteredNotes.length === 0 ? (
           <div className="notes-empty">
-            <p>No notes yet</p>
+            <p>No memories yet</p>
             <p className="notes-empty-hint">
-              Save your first note by clicking "Save as Note" while browsing any webpage
+              Save your first memory by clicking "Save as Memory" while browsing any webpage
             </p>
           </div>
         ) : (

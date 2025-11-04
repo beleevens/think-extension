@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Think - AI Notes",
+  "name": "Think - AI Memories",
   "version": "1.0.0",
-  "description": "AI-powered note taking with cloud LLM. No account required - all notes stored locally.",
+  "description": "AI-powered memory capture with cloud LLM. No account required - all memories stored locally.",
   "permissions": [
     "storage",
     "unlimitedStorage",

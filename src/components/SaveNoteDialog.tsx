@@ -222,8 +222,8 @@ export function SaveNoteDialog({
                 >
                   {/* Header */}
                   <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
-                    <h2 className="text-lg font-semibold" style={{ color: 'hsl(var(--foreground))' }}>Save Page as Note</h2>
-                    <p className="text-sm mt-1" style={{ color: 'hsl(var(--muted-foreground))' }}>Save this page to your notes collection</p>
+                    <h2 className="text-lg font-semibold" style={{ color: 'hsl(var(--foreground))' }}>Save Page as Memory</h2>
+                    <p className="text-sm mt-1" style={{ color: 'hsl(var(--muted-foreground))' }}>Save this page to your memories collection</p>
                   </div>
 
                   {/* Content */}
@@ -278,7 +278,7 @@ export function SaveNoteDialog({
                         backgroundColor: 'hsl(var(--primary))'
                       }}
                     >
-                      Save Note
+                      Save Memory
                     </button>
                   </div>
                 </motion.div>
@@ -305,7 +305,7 @@ export function SaveNoteDialog({
                     className="mt-6 text-lg font-medium"
                     style={{ color: 'hsl(var(--foreground))' }}
                   >
-                    {dialogState === 'saving' ? 'Saving your note...' : 'Note saved successfully!'}
+                    {dialogState === 'saving' ? 'Saving your memory...' : 'Memory saved successfully!'}
                   </motion.p>
 
                   {/* Reserve button space in both states for consistent height */}
@@ -320,7 +320,7 @@ export function SaveNoteDialog({
                           onClick={handleViewNote}
                           className="btn btn-secondary"
                         >
-                          View note
+                          View memory
                         </button>
                       </motion.div>
                     )}

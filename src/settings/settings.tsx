@@ -473,16 +473,16 @@ function SettingsPage() {
       const a = document.createElement('a');
       a.href = url;
       const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-      a.download = `think-better-notes-${timestamp}.json`;
+      a.download = `think-better-memories-${timestamp}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      setSaveMessage({ type: 'success', text: `Exported ${notesCount} notes successfully` });
+      setSaveMessage({ type: 'success', text: `Exported ${notesCount} memories successfully` });
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
-      setSaveMessage({ type: 'error', text: 'Failed to export notes' });
+      setSaveMessage({ type: 'error', text: 'Failed to export memories' });
       setTimeout(() => setSaveMessage(null), 3000);
     }
   };
@@ -494,16 +494,16 @@ function SettingsPage() {
       const a = document.createElement('a');
       a.href = url;
       const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-      a.download = `think-better-notes-markdown-${timestamp}.zip`;
+      a.download = `think-better-memories-markdown-${timestamp}.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      setSaveMessage({ type: 'success', text: `Exported ${notesCount} notes as markdown` });
+      setSaveMessage({ type: 'success', text: `Exported ${notesCount} memories as markdown` });
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
-      setSaveMessage({ type: 'error', text: 'Failed to export notes as markdown' });
+      setSaveMessage({ type: 'error', text: 'Failed to export memories as markdown' });
       setTimeout(() => setSaveMessage(null), 3000);
     }
   };
@@ -516,10 +516,10 @@ function SettingsPage() {
       const text = await file.text();
       const count = await importNotes(text, true); // merge by default
       await loadNotesStatistics(); // Refresh statistics
-      setSaveMessage({ type: 'success', text: `Imported ${count} notes successfully` });
+      setSaveMessage({ type: 'success', text: `Imported ${count} memories successfully` });
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
-      setSaveMessage({ type: 'error', text: 'Failed to import notes: ' + (error instanceof Error ? error.message : 'Invalid file') });
+      setSaveMessage({ type: 'error', text: 'Failed to import memories: ' + (error instanceof Error ? error.message : 'Invalid file') });
       setTimeout(() => setSaveMessage(null), 3000);
     }
     // Reset file input
@@ -527,17 +527,17 @@ function SettingsPage() {
   };
 
   const handleClearAllNotes = async () => {
-    if (!confirm(`Are you sure you want to delete all ${notesCount} notes? This action cannot be undone.`)) {
+    if (!confirm(`Are you sure you want to delete all ${notesCount} memories? This action cannot be undone.`)) {
       return;
     }
 
     try {
       const count = await clearAllNotes();
       await loadNotesStatistics(); // Refresh statistics
-      setSaveMessage({ type: 'success', text: `Cleared ${count} notes successfully` });
+      setSaveMessage({ type: 'success', text: `Cleared ${count} memories successfully` });
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
-      setSaveMessage({ type: 'error', text: 'Failed to clear notes' });
+      setSaveMessage({ type: 'error', text: 'Failed to clear memories' });
       setTimeout(() => setSaveMessage(null), 3000);
     }
   };
@@ -646,7 +646,7 @@ function SettingsPage() {
               role="tab"
               aria-selected={activeTab === 'notes'}
             >
-              Notes
+              Memories
             </button>
             <button
               ref={tabRefs.plugins}
@@ -974,11 +974,11 @@ function SettingsPage() {
                     />
                     <div style={{ flex: 1 }}>
                       <span style={{ fontWeight: '500', display: 'block', marginBottom: '0.25rem' }}>
-                        Auto-open conversation when clicking a note
+                        Auto-open conversation when clicking a memory
                       </span>
                       <p className="help-text" style={{ margin: 0, fontSize: '0.875rem' }}>
-                        When enabled, clicking a note will automatically open its conversation in the side panel.
-                        When disabled, you'll need to click the "Open Conversation" button to view a note's chat history.
+                        When enabled, clicking a memory will automatically open its conversation in the side panel.
+                        When disabled, you'll need to click the "Open Conversation" button to view a memory's chat history.
                       </p>
                     </div>
                   </label>
@@ -1003,11 +1003,11 @@ function SettingsPage() {
               <section className="settings-section info-section">
                 <h2>About Privacy & Storage</h2>
                 <ul className="info-list">
-                  <li><strong>Local-First:</strong> All your notes are stored in Chrome's local storage on your device.</li>
+                  <li><strong>Local-First:</strong> All your memories are stored in Chrome's local storage on your device.</li>
                   <li><strong>No Account Required:</strong> No sign-up, no login, no cloud sync.</li>
-                  <li><strong>AI Processing:</strong> When using AI features, note content is sent to your selected AI provider for processing.</li>
-                  <li><strong>Backup:</strong> Export your notes regularly to prevent data loss if browser data is cleared.</li>
-                  <li><strong>Privacy:</strong> We don't collect any data. Your API key and notes stay on your device.</li>
+                  <li><strong>AI Processing:</strong> When using AI features, memory content is sent to your selected AI provider for processing.</li>
+                  <li><strong>Backup:</strong> Export your memories regularly to prevent data loss if browser data is cleared.</li>
+                  <li><strong>Privacy:</strong> We don't collect any data. Your API key and memories stay on your device.</li>
                 </ul>
               </section>
 
@@ -1015,13 +1015,13 @@ function SettingsPage() {
               <section className="settings-section">
                 <h2>Local Storage & Data</h2>
           <p className="help-text">
-            All your data is stored locally in your browser using Chrome storage. This includes notes, conversations, settings, plugins, and variables. Your data never leaves your device unless you explicitly export it.
+            All your data is stored locally in your browser using Chrome storage. This includes memories, conversations, settings, plugins, and variables. Your data never leaves your device unless you explicitly export it.
           </p>
 
           {/* Storage Statistics - Category Breakdown */}
           <div className="storage-categories-grid">
             <div className="stat-card category-card">
-              <div className="stat-label">Notes</div>
+              <div className="stat-label">Memories</div>
               <div className="stat-value">
                 {loadingNotes ? '...' : (
                   <>
@@ -1093,7 +1093,7 @@ function SettingsPage() {
             </div>
             {!loadingNotes && storageBreakdown && (
               <div className="total-breakdown">
-                Notes {storageBreakdown.notes.percentage}% •
+                Memories {storageBreakdown.notes.percentage}% •
                 Conversations {storageBreakdown.conversations.percentage}% •
                 Settings {storageBreakdown.settings.percentage}% •
                 Plugins {storageBreakdown.plugins.percentage}%
@@ -1107,29 +1107,29 @@ function SettingsPage() {
             <div className="notes-action-group">
               <h3>Backup & Restore</h3>
               <p className="help-text" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
-                <strong>Export:</strong> Download all your notes as JSON (for backup/restore) or as individual markdown files (for portability). Markdown export creates a zip file with one .md file per note including metadata.
+                <strong>Export:</strong> Download all your memories as JSON (for backup/restore) or as individual markdown files (for portability). Markdown export creates a zip file with one .md file per memory including metadata.
                 <br /><br />
-                <strong>Import:</strong> Upload a previously exported JSON file to restore notes. When importing, notes are merged with existing notes. Duplicate notes (same ID) are skipped, ensuring you can safely re-import the same file without creating duplicates.
+                <strong>Import:</strong> Upload a previously exported JSON file to restore memories. When importing, memories are merged with existing memories. Duplicate memories (same ID) are skipped, ensuring you can safely re-import the same file without creating duplicates.
               </p>
               <div className="button-group">
                 <button
                   onClick={handleExportNotes}
                   disabled={notesCount === 0 || loadingNotes}
                   className="btn btn-primary"
-                  title="Download all notes as JSON file"
+                  title="Download all memories as JSON file"
                 >
-                  Export All Notes
+                  Export All Memories
                 </button>
                 <button
                   onClick={handleExportNotesAsMarkdown}
                   disabled={notesCount === 0 || loadingNotes}
                   className="btn btn-primary"
-                  title="Download all notes as individual markdown files in a zip"
+                  title="Download all memories as individual markdown files in a zip"
                 >
                   Export as Markdown
                 </button>
                 <label className="btn btn-primary" style={{ margin: 0 }}>
-                  Import Notes
+                  Import Memories
                   <input
                     type="file"
                     accept="application/json,.json"
@@ -1141,17 +1141,17 @@ function SettingsPage() {
             </div>
 
             <div className="notes-action-group">
-              <h3>Delete All Notes</h3>
+              <h3>Delete All Memories</h3>
               <button
                 onClick={handleClearAllNotes}
                 disabled={notesCount === 0 || loadingNotes}
                 className="btn btn-danger"
-                title="Permanently delete all notes"
+                title="Permanently delete all memories"
               >
-                Clear All Notes
+                Clear All Memories
               </button>
               <p className="help-text" style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>
-                Warning: This will permanently delete all {notesCount} notes. Export first to backup!
+                Warning: This will permanently delete all {notesCount} memories. Export first to backup!
               </p>
               </div>
             </div>

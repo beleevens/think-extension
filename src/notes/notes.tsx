@@ -131,7 +131,7 @@ function NotesPage() {
       return allNotes;
     } catch (error) {
       console.error('[NotesPage] Failed to load notes:', error);
-      showMessage('error', 'Failed to load notes');
+      showMessage('error', 'Failed to load memories');
       return [];
     } finally {
       setLoading(false);
@@ -161,7 +161,7 @@ function NotesPage() {
 
   const handleDelete = async (noteId: string, noteTitle: string) => {
     const confirmed = confirm(
-      `Delete note "${noteTitle}"?\n\nThis cannot be undone.`
+      `Delete memory "${noteTitle}"?\n\nThis cannot be undone.`
     );
 
     if (!confirmed) return;
@@ -185,11 +185,11 @@ function NotesPage() {
           setSelectedNoteId(remainingNotes.length > 0 ? remainingNotes[0].id : null);
         }
 
-        showMessage('success', 'Note deleted successfully');
+        showMessage('success', 'Memory deleted successfully');
       }
     } catch (error) {
       console.error('[NotesPage] Failed to delete note:', error);
-      showMessage('error', 'Failed to delete note');
+      showMessage('error', 'Failed to delete memory');
     } finally {
       setDeletingNoteId(null);
     }
@@ -233,7 +233,7 @@ function NotesPage() {
   if (loading) {
     return (
       <div className="notes-page-loading">
-        <p>Loading notes...</p>
+        <p>Loading memories...</p>
       </div>
     );
   }
@@ -255,7 +255,7 @@ function NotesPage() {
             alt="Think OS" 
             style={{ height: '20px' }} 
           />
-          <h2 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 'normal', lineHeight: '1.5' }}>My Notes</h2>
+          <h2 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 'normal', lineHeight: '1.5' }}>My Memories</h2>
         </div>
       </div>
 
