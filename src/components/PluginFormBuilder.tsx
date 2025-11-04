@@ -148,7 +148,6 @@ export function PluginFormBuilder({ onCancel, onSave, initialPlugin }: PluginFor
       name: name.trim(),
       description: description.trim(),
       icon: icon || '🔌',
-      prompt: outputType === 'blocks' ? '' : prompt.trim(),
       outputType,
       display: {
         dataSource: pluginId,
@@ -158,7 +157,12 @@ export function PluginFormBuilder({ onCancel, onSave, initialPlugin }: PluginFor
       },
     };
 
-    // Add blocks
+    // Add prompt only for non-block types
+    if (outputType !== 'blocks') {
+      plugin.prompt = prompt.trim();
+    }
+
+    // Add blocks for block type
     if (outputType === 'blocks') {
       plugin.blocks = blocks.map(b => ({
         id: b.id,  // IDs are always generated when blocks are created

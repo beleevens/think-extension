@@ -78,7 +78,7 @@ export interface ConfigPlugin {
   icon: string;
 
   // Behavior
-  prompt: string;              // Prompt template with {{variable}} placeholders
+  prompt?: string;              // Prompt template with {{variable}} placeholders (required for text/tags, optional for blocks)
   outputType: 'text' | 'tags' | 'blocks';  // Keep for validation/compatibility
 
   // Display configuration
@@ -156,7 +156,7 @@ export const ConfigPluginSchema = z.object({
   icon: z.string().max(50, 'Plugin icon too long'),
 
   // Behavior
-  prompt: z.string().min(1, 'Plugin prompt must not be empty').max(20000, 'Plugin prompt too long'),
+  prompt: z.string().max(20000, 'Plugin prompt too long').optional(),
   outputType: z.enum(['text', 'tags', 'blocks']),
 
   // Display configuration
@@ -171,11 +171,30 @@ export const ConfigPluginSchema = z.object({
     if (data.outputType === 'blocks' && (!data.blocks || data.blocks.length === 0)) {
       return false;
     }
+    // If outputType is 'text' or 'tags', prompt must be provided and not empty
+    if ((data.outputType === 'text' || data.outputType === 'tags') && (!data.prompt || data.prompt.trim().length === 0)) {
+      return false;
+    }
     return true;
   },
-  {
-    message: "blocks array is required when outputType is 'blocks'",
-    path: ['blocks'],
+  (data) => {
+    // Return appropriate error message based on which validation failed
+    if (data.outputType === 'blocks' && (!data.blocks || data.blocks.length === 0)) {
+      return {
+        message: "blocks array is required when outputType is 'blocks'",
+        path: ['blocks'],
+      };
+    }
+    if ((data.outputType === 'text' || data.outputType === 'tags') && (!data.prompt || data.prompt.trim().length === 0)) {
+      return {
+        message: "prompt is required and must not be empty when outputType is 'text' or 'tags'",
+        path: ['prompt'],
+      };
+    }
+    return {
+      message: "Invalid plugin configuration",
+      path: [],
+    };
   }
 );
 
