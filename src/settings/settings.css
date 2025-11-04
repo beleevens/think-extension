@@ -165,11 +165,21 @@ html {
 }
 
 .md-tab:hover {
-  background-color: hsl(var(--muted) / 0.5);
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+
+.dark .md-tab:hover {
+  background-color: hsl(var(--card));
 }
 
 .md-tab:focus-visible {
-  background-color: hsl(var(--muted) / 0.3);
+  background-color: hsl(var(--muted) / 0.8);
+  color: hsl(var(--foreground));
+}
+
+.dark .md-tab:focus-visible {
+  background-color: hsl(var(--card) / 0.8);
 }
 
 .md-tab-active {
@@ -421,14 +431,30 @@ html {
 
 .info-list {
   margin: 0;
-  padding-left: 1.5rem;
+  padding: 0;
   color: hsl(var(--muted-foreground));
   font-size: 0.875rem;
   line-height: 1.8;
+  list-style: none;
 }
 
 .info-list li {
   margin-bottom: 0.5rem;
+}
+
+.info-list strong {
+  color: hsl(var(--foreground));
+}
+
+/* Remove padding from UL lists in settings sections */
+.settings-section ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.settings-section ul strong {
+  color: hsl(var(--foreground));
 }
 
 /* Connection Grid */

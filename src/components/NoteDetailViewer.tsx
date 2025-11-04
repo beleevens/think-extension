@@ -1,9 +1,9 @@
-import { ExternalLink, Calendar, Globe, MessageSquare, Sparkles, Loader2, Undo2, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Calendar, Globe, Sparkles, Loader2, Undo2, Trash2 } from 'lucide-react';
 import type { LocalNote } from '../lib/types';
 import type { Plugin, DisplayRule } from '../plugins/plugin-types';
 import { markdownToHtml } from '../lib/markdown';
 import { formatFullDate, formatRelativeDateLong } from '../lib/date-utils';
-import { useState, useEffect } from 'react';
 import { cleanupContent } from '../lib/content-cleanup';
 import { updateNoteContent } from '../lib/local-notes';
 import { DisplayRenderer } from './DisplayRenderer';
@@ -32,6 +32,10 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
   const [isCleaningUp, setIsCleaningUp] = useState(false);
   const [cleanupError, setCleanupError] = useState<string | null>(null);
   const [hasApiKey, setHasApiKey] = useState(false);
+  const [indicatorStyle, setIndicatorStyle] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const originalTabRef = useRef<HTMLButtonElement>(null);
+  const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
   useEffect(() => {
     // Load plugin displays from registered plugins
@@ -92,6 +96,32 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
     setCleanupError(null);
     setIsCleaningUp(false);
   }, [note?.id]);
+
+  // Update indicator position when active tab changes
+  useEffect(() => {
+    const updateIndicator = () => {
+      let activeTabElement: HTMLButtonElement | null = null;
+      if (activeTab === 'original') {
+        activeTabElement = originalTabRef.current;
+      } else {
+        activeTabElement = tabRefs.current[activeTab] || null;
+      }
+
+      const container = tabsContainerRef.current;
+      if (activeTabElement && container) {
+        const tabRect = activeTabElement.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        setIndicatorStyle({
+          left: tabRect.left - containerRect.left,
+          width: tabRect.width,
+        });
+      }
+    };
+
+    updateIndicator();
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [activeTab, tabDisplays]);
 
   const handleCleanup = async () => {
     if (!note) return;
@@ -198,7 +228,7 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
               rel="noopener noreferrer"
               className="meta-link"
             >
-              {note.domain}
+              {note.domain.replace(/^www\./i, '')}
             </a>
           </div>
           <div className="meta-item">
@@ -207,151 +237,165 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
               {formatRelativeDateLong(note.updatedAt)}
             </span>
           </div>
-        </div>
-
-        {/* Dynamic Plugin Header Displays */}
-        {headerDisplays.map(item => (
-          <DisplayRenderer
-            key={item.pluginId}
-            display={item.display}
-            data={item.data}
-            pluginName={item.pluginName}
-            position="header"
-            plugin={item.plugin}
-          />
-        ))}
-
-        {/* Action Buttons */}
-        <div className="note-detail-header-actions">
-          <a
-            href={note.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary"
-          >
-            <ExternalLink size={16} />
-            Open Original Page
-          </a>
-          {onSendToChat && (
+          <div className="meta-item">
+            <Trash2 size={14} />
             <button
-              onClick={() => onSendToChat(note)}
-              className="btn btn-secondary"
+              onClick={() => onDelete(note.id, note.title)}
+              disabled={deleting}
+              className="meta-link meta-link-button"
+              style={{ background: 'none', border: 'none', padding: 0, cursor: deleting ? 'not-allowed' : 'pointer' }}
             >
-              <MessageSquare size={16} />
-              Open Conversation
+              {deleting ? 'Deleting...' : 'Delete Note'}
             </button>
-          )}
-          <button
-            onClick={() => onDelete(note.id, note.title)}
-            disabled={deleting}
-            className="btn btn-danger"
-          >
-            <Trash2 size={16} />
-            {deleting ? 'Deleting...' : 'Delete Note'}
-          </button>
+          </div>
         </div>
+
+        {/* Dynamic Plugin Header Displays (non-tags) */}
+        {headerDisplays
+          .filter(item => item.display.format !== 'tags')
+          .map(item => (
+            <DisplayRenderer
+              key={item.pluginId}
+              display={item.display}
+              data={item.data}
+              pluginName={item.pluginName}
+              position="header"
+              plugin={item.plugin}
+            />
+          ))}
       </div>
 
       {/* Tab Navigation */}
-      <div className="note-tabs">
-        <button
-          onClick={() => setActiveTab('original')}
-          className={activeTab === 'original' ? 'active' : ''}
-        >
-          Original
-        </button>
-        {/* Dynamic Plugin Tabs */}
-        {tabDisplays.map(item => (
+      <div className="note-tabs-container" ref={tabsContainerRef}>
+        <div className="note-tabs">
           <button
-            key={item.pluginId}
-            onClick={() => setActiveTab(item.pluginId)}
-            className={activeTab === item.pluginId ? 'active' : ''}
+            ref={originalTabRef}
+            onClick={() => setActiveTab('original')}
+            className={`note-tab ${activeTab === 'original' ? 'note-tab-active' : ''}`}
+            role="tab"
+            aria-selected={activeTab === 'original'}
           >
-            {item.display.tabName || item.pluginName}
+            Original
           </button>
-        ))}
+          {/* Dynamic Plugin Tabs */}
+          {tabDisplays.map(item => (
+            <button
+              key={item.pluginId}
+              ref={(el) => {
+                tabRefs.current[item.pluginId] = el;
+              }}
+              onClick={() => setActiveTab(item.pluginId)}
+              className={`note-tab ${activeTab === item.pluginId ? 'note-tab-active' : ''}`}
+              role="tab"
+              aria-selected={activeTab === item.pluginId}
+            >
+              {item.display.tabName || item.pluginName}
+            </button>
+          ))}
+        </div>
+        <div className="note-tab-indicator" style={{ left: `${indicatorStyle.left}px`, width: `${indicatorStyle.width}px` }}></div>
+        {activeTab === 'original' && (
+          <div className="note-tabs-right">
+            {note.originalContent ? (
+              // Show Undo button if content has been cleaned
+              <div className="meta-item" style={{ display: 'inline-flex' }}>
+                {isCleaningUp ? (
+                  <>
+                    <Loader2 size={14} className="spin" />
+                    <button
+                      onClick={handleUndoCleanup}
+                      disabled={isCleaningUp}
+                      className="meta-link meta-link-button"
+                      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                    >
+                      Restoring...
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Undo2 size={14} />
+                    <button
+                      onClick={handleUndoCleanup}
+                      disabled={isCleaningUp}
+                      className="meta-link meta-link-button"
+                      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                    >
+                      Undo Cleanup
+                    </button>
+                  </>
+                )}
+              </div>
+            ) : (
+              // Show Cleanup button if content hasn't been cleaned
+              <div className="meta-item" style={{ display: 'inline-flex' }}>
+                {isCleaningUp ? (
+                  <>
+                    <Loader2 size={14} className="spin" />
+                    <button
+                      onClick={handleCleanup}
+                      disabled={isCleaningUp || !hasApiKey}
+                      className="meta-link meta-link-button"
+                      style={{ background: 'none', border: 'none', padding: 0, cursor: isCleaningUp || !hasApiKey ? 'not-allowed' : 'pointer' }}
+                      title={hasApiKey ? "Remove artifacts, navigation, ads, and noise using AI" : "Configure API key in settings to use cleanup"}
+                    >
+                      Cleaning...
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={14} />
+                    <button
+                      onClick={handleCleanup}
+                      disabled={isCleaningUp || !hasApiKey}
+                      className="meta-link meta-link-button"
+                      style={{ background: 'none', border: 'none', padding: 0, cursor: isCleaningUp || !hasApiKey ? 'not-allowed' : 'pointer' }}
+                      title={hasApiKey ? "Remove artifacts, navigation, ads, and noise using AI" : "Configure API key in settings to use cleanup"}
+                    >
+                      Cleanup Content
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Tab Content */}
       <div className="note-tab-content">
         {activeTab === 'original' && (
           <>
-            {/* Cleanup Button - shown above original content */}
-            <div style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid hsl(var(--border))' }}>
-              {note.originalContent ? (
-                // Show Undo button if content has been cleaned
-                <button
-                  onClick={handleUndoCleanup}
-                  disabled={isCleaningUp}
-                  className="btn btn-secondary"
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            {!hasApiKey && !note.originalContent && (
+              <p style={{
+                marginBottom: '1rem',
+                fontSize: '0.875rem',
+                color: 'hsl(var(--muted-foreground))',
+                fontStyle: 'italic'
+              }}>
+                Configure your API key in{' '}
+                <a
+                  href={chrome.runtime.getURL('src/settings/settings.html')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'hsl(var(--primary))', textDecoration: 'underline' }}
                 >
-                  {isCleaningUp ? (
-                    <>
-                      <Loader2 size={16} className="spin" />
-                      Restoring...
-                    </>
-                  ) : (
-                    <>
-                      <Undo2 size={16} />
-                      Undo Cleanup
-                    </>
-                  )}
-                </button>
-              ) : (
-                // Show Cleanup button if content hasn't been cleaned
-                <button
-                  onClick={handleCleanup}
-                  disabled={isCleaningUp || !hasApiKey}
-                  className="btn btn-secondary"
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                  title={hasApiKey ? "Remove artifacts, navigation, ads, and noise using AI" : "Configure API key in settings to use cleanup"}
-                >
-                  {isCleaningUp ? (
-                    <>
-                      <Loader2 size={16} className="spin" />
-                      Cleaning...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles size={16} />
-                      Cleanup Content
-                    </>
-                  )}
-                </button>
-              )}
-              {!hasApiKey && !note.originalContent && (
-                <p style={{
-                  marginTop: '0.5rem',
-                  fontSize: '0.875rem',
-                  color: 'hsl(var(--muted-foreground))',
-                  fontStyle: 'italic'
-                }}>
-                  Configure your API key in{' '}
-                  <a
-                    href={chrome.runtime.getURL('src/settings/settings.html')}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: 'hsl(var(--primary))', textDecoration: 'underline' }}
-                  >
-                    settings
-                  </a>
-                  {' '}to use AI cleanup
-                </p>
-              )}
-              {cleanupError && (
-                <div style={{
-                  marginTop: '0.5rem',
-                  padding: '0.5rem',
-                  backgroundColor: 'hsl(var(--destructive) / 0.1)',
-                  color: 'hsl(var(--destructive))',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem'
-                }}>
-                  {cleanupError}
-                </div>
-              )}
-            </div>
+                  settings
+                </a>
+                {' '}to use AI cleanup
+              </p>
+            )}
+            {cleanupError && (
+              <div style={{
+                marginBottom: '1rem',
+                padding: '0.5rem',
+                backgroundColor: 'hsl(var(--destructive) / 0.1)',
+                color: 'hsl(var(--destructive))',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem'
+              }}>
+                {cleanupError}
+              </div>
+            )}
 
             {/* Original Content */}
             <div
@@ -377,6 +421,20 @@ export function NoteDetailViewer({ note, onDelete, deleting, onSendToChat, onNot
             />
           );
         })}
+
+        {/* Tags below tab content */}
+        {headerDisplays
+          .filter(item => item.display.format === 'tags')
+          .map(item => (
+            <DisplayRenderer
+              key={item.pluginId}
+              display={item.display}
+              data={item.data}
+              pluginName={item.pluginName}
+              position="header"
+              plugin={item.plugin}
+            />
+          ))}
       </div>
     </div>
   );

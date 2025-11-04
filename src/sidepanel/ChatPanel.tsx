@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, Library, Eraser, PlusCircle, Loader2, Check, FileText, ExternalLink } from 'lucide-react';
+import { Settings, Library, PlusCircle, Loader2, Check, FileText, ExternalLink } from 'lucide-react';
 import { captureCurrentPage, saveCurrentPageAsNote, canCapturePage } from '../lib/page-capture';
 import { SaveNoteDialog } from '../components/SaveNoteDialog';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -826,15 +826,6 @@ export function ChatPanel() {
                 aria-label="Open notes"
               >
                 <Library size={18} />
-              </button>
-              <button
-                className={`settings-button ${messages.length > 0 || activeContext ? 'text-destructive' : 'opacity-40 cursor-not-allowed'}`}
-                onClick={clearAllContext}
-                disabled={messages.length === 0 && !activeContext}
-                title="Clear all messages and context"
-                aria-label="Clear context"
-              >
-                <Eraser size={18} />
               </button>
               <ThemeToggle />
               <button
