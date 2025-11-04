@@ -5,6 +5,7 @@
 
 import { pluginManager } from './plugin-manager';
 import type { ConfigPlugin } from './plugin-types';
+import { validatePlugins } from './plugin-types';
 
 /**
  * Load user-created config plugins from storage
@@ -12,30 +13,47 @@ import type { ConfigPlugin } from './plugin-types';
 async function loadConfigPlugins(): Promise<void> {
   try {
     const result = await chrome.storage.local.get('configPlugins');
-    const configPlugins = (result.configPlugins || []) as ConfigPlugin[];
+    const rawPlugins = result.configPlugins || [];
 
-    if (configPlugins.length > 0) {
-      let needsMigration = false;
+    if (rawPlugins.length === 0) {
+      return;
+    }
 
-      for (const plugin of configPlugins) {
-        // One-time migration: Add IDs to blocks that don't have them
-        // This handles legacy plugins created before ID persistence was fixed
-        if (plugin.blocks) {
-          for (const block of plugin.blocks) {
-            if (!block.id) {
-              block.id = crypto.randomUUID();
-              needsMigration = true;
-            }
+    // First, validate all plugins
+    const { validPlugins, errors } = validatePlugins(rawPlugins);
+
+    // Log validation errors
+    if (errors.length > 0) {
+      console.error('[PluginRegistry] Invalid plugins detected and skipped during load:', errors);
+    }
+
+    let needsMigration = false;
+
+    // Process valid plugins
+    for (const plugin of validPlugins) {
+      // One-time migration: Add IDs to blocks that don't have them
+      // This handles legacy plugins created before ID persistence was fixed
+      if (plugin.blocks) {
+        for (const block of plugin.blocks) {
+          if (!block.id) {
+            block.id = crypto.randomUUID();
+            needsMigration = true;
           }
         }
-
-        pluginManager.register(plugin);
       }
 
-      // Save migrated plugins back to storage (one-time only)
+      pluginManager.register(plugin);
+    }
+
+    // Save cleaned and migrated plugins back to storage
+    // This removes invalid plugins and adds missing IDs
+    if (needsMigration || errors.length > 0) {
+      await chrome.storage.local.set({ configPlugins: validPlugins });
       if (needsMigration) {
-        await chrome.storage.local.set({ configPlugins });
         console.log('[PluginRegistry] Migrated blocks without IDs');
+      }
+      if (errors.length > 0) {
+        console.log('[PluginRegistry] Removed invalid plugins from storage');
       }
     }
   } catch (error) {

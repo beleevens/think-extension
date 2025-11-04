@@ -4,6 +4,7 @@
  */
 
 import type { Plugin, PluginStorage, NoteInput } from './plugin-types';
+import { validatePlugins } from './plugin-types';
 import { ConfigPluginExecutor } from './plugin-executor';
 import { DEFAULT_PLUGINS, DEFAULT_PLUGIN_STATES } from './default-plugins';
 
@@ -160,8 +161,18 @@ class PluginManager {
     // Auto-load plugins if not registered yet (fixes cross-context execution)
     if (this.plugins.size === 0) {
       const result = await chrome.storage.local.get('configPlugins');
-      const configPlugins = (result.configPlugins || []) as Plugin[];
-      configPlugins.forEach(plugin => this.register(plugin));
+      const rawPlugins = result.configPlugins || [];
+
+      // Validate plugins before registering
+      const { validPlugins, errors } = validatePlugins(rawPlugins);
+
+      // Log validation errors
+      if (errors.length > 0) {
+        console.error('[PluginManager] Invalid plugins detected and skipped:', errors);
+      }
+
+      // Register only valid plugins
+      validPlugins.forEach(plugin => this.register(plugin));
     }
 
     const storage = await chrome.storage.local.get('plugins');
@@ -246,10 +257,18 @@ class PluginManager {
   async initializePlugins(): Promise<void> {
     const storage = await chrome.storage.local.get(['plugins', 'configPlugins']);
     const pluginStates = (storage.plugins || {}) as PluginStorage;
-    const configPlugins = (storage.configPlugins || []) as any[];
+    const rawConfigPlugins = storage.configPlugins || [];
+
+    // Validate existing config plugins
+    const { validPlugins: configPlugins, errors } = validatePlugins(rawConfigPlugins);
+
+    // Log validation errors for existing plugins
+    if (errors.length > 0) {
+      console.error('[PluginManager] Invalid plugins found in storage during initialization:', errors);
+    }
 
     let needsUpdate = false;
-    let needsConfigUpdate = false;
+    let needsConfigUpdate = errors.length > 0; // Need update if we filtered out invalid plugins
 
     // Initialize plugin states for registered plugins
     for (const plugin of this.plugins.values()) {
@@ -264,7 +283,7 @@ class PluginManager {
 
     // Initialize default config plugins if not present
     for (const defaultPlugin of DEFAULT_PLUGINS) {
-      const exists = configPlugins.some((p: any) => p.id === defaultPlugin.id);
+      const exists = configPlugins.some((p: Plugin) => p.id === defaultPlugin.id);
       if (!exists) {
         configPlugins.push(defaultPlugin);
         needsConfigUpdate = true;

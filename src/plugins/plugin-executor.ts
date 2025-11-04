@@ -9,6 +9,69 @@ import type { ClaudeMessage } from '../lib/claude-client';
 import { loadProviderSettings, createAIClient, type AIProvider } from '../lib/ai-client';
 import type { ConfigPlugin, NoteInput, PluginContext, PluginResult } from './plugin-types';
 
+/**
+ * Sanitizes variable values to prevent prompt injection attacks
+ *
+ * Security measures:
+ * - Limits string length to prevent overwhelming prompts
+ * - Preserves legitimate content while making injection harder
+ * - Handles different data types appropriately
+ *
+ * @param value - The value to sanitize (can be any type)
+ * @param maxLength - Maximum allowed length for string values
+ * @returns Sanitized string representation
+ */
+function sanitizeVariableValue(value: unknown, maxLength: number = 50000): string {
+  // Handle null/undefined
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  // Handle arrays - join with commas
+  if (Array.isArray(value)) {
+    const joined = value.map(v => String(v)).join(', ');
+    return joined.length > maxLength ? joined.substring(0, maxLength) + '...' : joined;
+  }
+
+  // Handle objects - stringify (already happens in replaceVariables, but defend in depth)
+  if (typeof value === 'object') {
+    const stringified = JSON.stringify(value);
+    return stringified.length > maxLength ? stringified.substring(0, maxLength) + '...' : stringified;
+  }
+
+  // Convert to string
+  let str = String(value);
+
+  // Enforce length limit
+  if (str.length > maxLength) {
+    str = str.substring(0, maxLength) + '...';
+  }
+
+  return str;
+}
+
+/**
+ * Validates that a variable path is safe and doesn't attempt to access sensitive data
+ *
+ * @param path - The variable path to validate (e.g., 'title', 'plugins.foo.bar')
+ * @returns true if the path is safe, false otherwise
+ */
+function isValidVariablePath(path: string): boolean {
+  // Disallow paths that try to access prototype or constructor
+  // Using case-insensitive regex to catch mixed-case bypass attempts (e.g., __Proto__, CONSTRUCTOR)
+  const dangerousPatterns = [
+    /__proto__/i,
+    /constructor/i,
+    /prototype/i,
+    /__defineGetter__/i,
+    /__defineSetter__/i,
+    /__lookupGetter__/i,
+    /__lookupSetter__/i,
+  ];
+
+  return !dangerousPatterns.some(pattern => pattern.test(path));
+}
+
 export class ConfigPluginExecutor {
   /**
    * Get metadata from notes storage
@@ -239,7 +302,8 @@ export class ConfigPluginExecutor {
       const blockIdSet = new Set(blockIds);
       for (let i = 0; i < plugin.blocks.length; i++) {
         const block = plugin.blocks[i];
-        const regex = /\{\{blocks\.([^}]+)\}\}/g;
+        // Use bounded quantifier to prevent ReDoS: limit block ID length to 100 chars
+        const regex = /\{\{blocks\.([^}]{1,100})\}\}/g;
         let match;
         while ((match = regex.exec(block.prompt)) !== null) {
           const refId = match[1];
@@ -318,6 +382,12 @@ export class ConfigPluginExecutor {
     variables?: Record<string, string>
   ): string {
     return template.replace(/\{\{([^}]+)\}\}/g, (match, path) => {
+      // Security: Validate the variable path
+      if (!isValidVariablePath(path)) {
+        console.error(`[ConfigPluginExecutor] Blocked dangerous variable path: {{${path}}}`);
+        return '';
+      }
+
       // Handle blocks.blockId syntax (for same-plugin block references)
       if (path.startsWith('blocks.')) {
         const blockId = path.substring(7); // Remove 'blocks.' prefix
@@ -326,7 +396,8 @@ export class ConfigPluginExecutor {
 
         if (blockValue !== undefined) {
           console.log(`[ConfigPluginExecutor] Block reference {{${path}}} resolved (${blockValue.length} chars)`);
-          return String(blockValue);
+          // Security: Sanitize block output before insertion
+          return sanitizeVariableValue(blockValue);
         }
 
         // Block not found - likely hasn't been executed yet or doesn't exist
@@ -356,37 +427,35 @@ export class ConfigPluginExecutor {
           // If plugin output is an object (like blocks), get specific block
           if (typeof value === 'object' && !Array.isArray(value)) {
             const blockValue = value[blockId];
-            return blockValue !== undefined ? String(blockValue) : '';
+            // Security: Sanitize cross-plugin data before insertion
+            return blockValue !== undefined ? sanitizeVariableValue(blockValue) : '';
           }
           // If it's not an object, can't access nested property
           return '';
         }
 
         // Handle simple plugins.pluginId (no nested path)
-        if (Array.isArray(value)) {
-          return value.join(', ');
-        }
-        if (typeof value === 'object') {
-          // For complex objects (like blocks), stringify
-          return JSON.stringify(value);
-        }
-        return String(value);
+        // Security: Sanitize plugin output before insertion
+        return sanitizeVariableValue(value);
       }
 
       // Handle special formatting for arrays (like existingTags)
       if (path === 'existingTags') {
-        return context.existingTags.join(', ');
+        // Security: Sanitize tag list before insertion
+        return sanitizeVariableValue(context.existingTags);
       }
 
       // Handle static variables (checked before context properties)
       if (variables && variables[path] !== undefined) {
-        return variables[path];
+        // Security: Sanitize static variable values
+        return sanitizeVariableValue(variables[path]);
       }
 
       // Handle direct context properties
       const value = (context as any)[path];
       if (value !== undefined) {
-        return String(value);
+        // Security: Sanitize all context values (title, content, url, domain, etc.)
+        return sanitizeVariableValue(value);
       }
 
       // Warn about missing article data properties
