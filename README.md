@@ -1,13 +1,13 @@
-# Think Better - AI Notes Extension
+# Think - AI Notes Extension
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/beleevens/think-extension/releases)
 
 > AI-powered note taking Chrome extension with Venice.ai, Claude, and Ollama (local). No account required - all notes stored locally in your browser.
 
-## What is Think Better?
+## What is Think Extension?
 
-Think Better is a Chrome extension that brings AI-powered note-taking directly to your browser. Capture notes from any webpage, chat with AI, get automatic summaries and tags, and keep everything organized locally.
+Think Extension is a Chrome extension that brings AI-powered note-taking directly to your browser. Capture notes from any webpage, chat with AI, get automatic summaries and tags, and keep everything organized locally.
 
 ---
 
@@ -46,7 +46,7 @@ Think Better is a Chrome extension that brings AI-powered note-taking directly t
 
 **Pin the Extension (Optional):**
 1. Click the extensions icon (puzzle piece) in your Chrome toolbar
-2. Find "Think Better - AI Notes"
+2. Find "Think - AI Notes"
 3. Click the pin icon to keep it visible in your toolbar
 
 ### Option 2: Build from Source
@@ -74,8 +74,6 @@ Think Better is a Chrome extension that brings AI-powered note-taking directly t
    - Enable **"Developer mode"**
    - Click **"Load unpacked"**
    - Select the `dist` folder from the project directory
-
-For detailed development instructions, see [README_DEV.md](README_DEV.md)
 
 ---
 
@@ -116,7 +114,7 @@ For security, the extension only connects to the default Ollama port (11434). Th
 
 ### Configure the Extension
 
-1. Click the Think Better extension icon in your toolbar
+1. Click the Think extension icon in your toolbar
 2. Click the **Settings** icon (gear icon) in the side panel
 3. Choose your AI provider:
    - **Venice.ai** or **Claude** - Paste your API key
@@ -163,7 +161,7 @@ These are powered by the built-in plugin system and can be customized or disable
 
 ### Custom Plugins System
 
-Think Better has a powerful, extensible plugin system that processes your saved notes with AI. No coding required!
+Think Extension has a powerful, extensible plugin system that processes your saved notes with AI. No coding required!
 
 #### Built-in Plugins
 
@@ -302,8 +300,8 @@ Access your notes by clicking the **Library** icon or right-clicking and selecti
 ### Context Menus
 
 Right-click shortcuts available:
-- **"Share with Think Better"** - Send selected text to chat
-- **"Share Page with Think Better"** - Add current page to chat context
+- **"Share with Think"** - Send selected text to chat
+- **"Share Page with Think"** - Add current page to chat context
 - **"Open My Notes"** - Open the notes management page
 
 ### Dark Mode
@@ -316,7 +314,7 @@ The extension automatically detects your system's dark mode preference. You can 
 
 **Extension Icon Not Showing**
 - Go to `chrome://extensions/` and ensure the extension is enabled
-- Click the extensions puzzle icon and pin "Think Better"
+- Click the extensions puzzle icon and pin "Think"
 
 **AI Chat Not Responding**
 - Check that your API key is saved correctly in Settings
@@ -381,5 +379,3 @@ The extension automatically detects your system's dark mode preference. You can 
 ---
 
 **Questions or Issues?** Open an issue on GitHub or contact the development team.
-
-**Developers:** See [README_DEV.md](README_DEV.md) for build instructions and development setup.

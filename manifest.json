@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Think Better - AI Notes",
+  "name": "Think - AI Notes",
   "version": "1.0.0",
   "description": "AI-powered note taking with cloud LLM. No account required - all notes stored locally.",
   "permissions": [
@@ -26,7 +26,7 @@
       "48": "icons/icon-48.png",
       "128": "icons/icon-128.png"
     },
-    "default_title": "Open Think Better"
+    "default_title": "Open Think"
   },
   "side_panel": {
     "default_path": "src/sidepanel/index.html"

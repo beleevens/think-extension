@@ -1,6 +1,6 @@
 # Design System - Extension Cloud
 
-> Comprehensive design guidelines for the Think Better Chrome Extension
+> Comprehensive design guidelines for the Think Extension
 
 ## 🎨 Color Palette
 

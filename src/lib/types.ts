@@ -1,5 +1,5 @@
 /**
- * Types for Think Better Cloud Extension (Standalone)
+ * Types for Think Extension (Standalone)
  * Cloud-only version with Venice.ai and Chrome local storage
  */
 

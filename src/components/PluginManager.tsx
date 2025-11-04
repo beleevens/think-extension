@@ -234,7 +234,7 @@ export function PluginManager() {
       <div className="plugin-manager-header">
         <h2 className="plugin-manager-title">Plugins</h2>
         <p className="plugin-manager-subtitle">
-          Extend Think Better with AI-powered features. Create custom plugins or import from JSON files.
+          Extend Think Extension with AI-powered features. Create custom plugins or import from JSON files.
         </p>
 
         {/* Import/Create Section */}

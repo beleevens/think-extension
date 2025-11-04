@@ -1,6 +1,6 @@
 /**
  * Plugin System Type Definitions
- * Simple, extensible plugin architecture for Think Better
+ * Simple, extensible plugin architecture for Think Extension
  */
 
 /**
